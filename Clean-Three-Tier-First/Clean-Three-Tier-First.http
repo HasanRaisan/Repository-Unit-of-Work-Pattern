@@ -1,0 +1,6 @@
+@Clean_Three_Tier_First_HostAddress = http://localhost:5230
+
+GET {{Clean_Three_Tier_First_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

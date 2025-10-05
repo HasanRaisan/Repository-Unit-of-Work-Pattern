@@ -1,0 +1,54 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Rider
+.idea/
+
+# Other
+*.db
+*.sqlite
+# *.bak
+*.swp
+*.tmp
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# DotCover
+*.dotCover
+
+# Test results
+TestResult*/  
+*.trx  
+*.coverage  
+*.coveragexml  
