@@ -1,6 +1,6 @@
 ﻿
 
-using Data.Entities;
+using Data.Data.Entities;
 using Data.Repositories.Generic;
 
 namespace Data.Repositories.Spesific

@@ -1,4 +1,5 @@
-﻿using Data.Entities;
+﻿using Data.Data;
+using Data.Data.Entities;
 using Data.Repositories.Generic;
 using Microsoft.EntityFrameworkCore;
 using System;

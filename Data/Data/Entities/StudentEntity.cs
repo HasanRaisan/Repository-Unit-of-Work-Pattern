@@ -5,7 +5,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Data.Entities
+namespace Data.Data.Entities
 {
     public class StudentEntity
     {
