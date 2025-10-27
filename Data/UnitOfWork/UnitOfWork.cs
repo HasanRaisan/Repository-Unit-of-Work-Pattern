@@ -11,11 +11,15 @@ namespace Data.UnitOfWork
         private readonly AppDbContext _context;
         public IRepository<Student> Students { get; private set; }
         public ITeacherRepository Teachers { get; private set; }
+        public IRepository<ApplicationRole> ApplicationRoles { get; private set; }
+        public IRepository<ApplicationUser> ApplicationUsers { get; private set; }
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
             Students = new Repository<Student>(_context);
             Teachers = new TeacherRepository(_context);
+            ApplicationUsers = new Repository<ApplicationUser>(_context);
+            ApplicationRoles = new Repository<ApplicationRole>(_context);
         }
         public async Task<int> SaveChangesAsync() =>  await _context.SaveChangesAsync();
         public void Dispose() => _context.Dispose();

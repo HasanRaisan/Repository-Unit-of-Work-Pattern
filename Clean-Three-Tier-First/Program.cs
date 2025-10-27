@@ -1,7 +1,8 @@
-﻿using Data.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
+﻿using Clean_Three_Tier_First.Midlleware;
 using Data.Data;
 using Data.Identity;
+using Data.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
@@ -20,8 +23,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentityConfiguration();
 
+
+
+
 var app = builder.Build();
 
+
+
+// Custum Middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
+app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
+app.UseMiddleware<RateLimitingMiddleware>();// 3. Profiling (measures the time for all subsequent requests)
+
+
+
+
+
+
+// Seed Roles and Adimn
 using (var scope = app.Services.CreateScope())
 {
     var service = scope.ServiceProvider;
@@ -134,3 +153,7 @@ namespace BLL.Extensions
 
 
  */
+
+
+// note : hard code (roles in data) 
+// services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
