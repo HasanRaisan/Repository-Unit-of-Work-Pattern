@@ -1,4 +1,4 @@
-using Data.UnitOfWork;
+﻿using Data.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Data.Data;
 using Data.Identity;
@@ -17,7 +17,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         b => b.MigrationsAssembly("Data"))
 );
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentityConfiguration();
 
@@ -46,3 +45,92 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+/*
+
+ BusinessLayer
+|
+|-- Configuration  // جديد: لإعدادات التطبيق (مثل JWT)
+|    |-- JwtSettings.cs  // تغيير الاسم ليعكس مجموعة الإعدادات (صيغة الجمع)
+|
+|-- Constants      // جديد: للثوابت العامة
+|    |-- RoleConstants.cs  // تم نقل الملف إلى هنا (اختياري)
+|
+|-- Mapping           // لنقل البيانات بين الطبقات (Entities/Domain)
+|    |-- // ملفات DTOs هنا (مثل UserDto.cs, AppointmentDto.cs)
+|
+|-- Models         // نماذج الطلب/الاستجابة المستخدمة في الخدمات
+|    |-- Auth
+|    |    |-- AssignRoleModel.cs
+|    |    |-- AuthResultModel.cs  // تغيير الاسم من AuthModel.cs ليكون أكثر تحديداً
+|    |    |-- LoginModel.cs
+|    |    |-- RegisterModel.cs    // تصحيح إملائي من ReqisterModel.cs
+|    |
+|    |-- AppointmentModel.cs
+|    |-- PatientModel.cs
+|
+|-- Services       // منطق العمل وتطبيق الواجهات
+|    |-- Auth
+|    |    |-- AuthService.cs
+|    |    |-- IAuthService.cs
+|    |    |-- ITokenService.cs
+|    |    |-- TokenService.cs
+|    |
+|    |-- Appointments
+|    |    |-- AppointmentService.cs  // نقل إلى مجلد فرعي
+|    |    |-- IAppointmentService.cs // إضافة الواجهة
+|    |
+|    |-- Patients
+|    |    |-- PatientService.cs    // نقل إلى مجلد فرعي
+|    |    |-- IPatientService.cs     // إضافة الواجهة
+|    |
+|    |-- ServiceCollectionExtensions.cs // لتسجيل الخدمات في حاوية IoC
+
+ */
+
+
+/*
+ 
+
+
+
+
+
+
+using BLL.Services;
+using BLL.Services.Auth;
+using DAL.Intrfices;
+using DAL.Repositreise;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace BLL.Extensions
+{
+
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        {
+            services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+
+            // Services
+            services.AddScoped<PatientService>();
+            services.AddScoped<AppointmentService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, TokenService>();
+
+            // AutoMapper
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+            return services;
+        }
+    }
+}
+
+
+
+
+
+ */

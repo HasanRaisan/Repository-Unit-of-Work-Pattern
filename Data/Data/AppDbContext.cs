@@ -8,7 +8,7 @@ namespace Data.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
-        public DbSet<StudentEntity> Students { get; set; }
+        public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

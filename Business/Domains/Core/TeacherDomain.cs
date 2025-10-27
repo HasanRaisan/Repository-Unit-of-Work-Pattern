@@ -5,13 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Data.Entities
+namespace Business.Domains.Core
 {
-    public class Teacher
+    public class TeacherDomain
     {
-        [Key]
         public int Id { get; set; }
-        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         public string Subject { get; set; } = string.Empty;
         public decimal Salary { get; set; }

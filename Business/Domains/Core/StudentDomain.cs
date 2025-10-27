@@ -5,16 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Data.Entities
+namespace Business.Domains.Core
 {
-    public class Teacher
+    public class StudentDomain
     {
-        [Key]
         public int Id { get; set; }
-        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
-        public string Subject { get; set; } = string.Empty;
-        public decimal Salary { get; set; }
-        public int DepartmentId { get; set; }
+        public int Age { get; set; }
+        public int Grade { get; set; }
+        public bool HasPassed => Grade >= 50;
     }
 }

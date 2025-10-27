@@ -1,13 +1,8 @@
-﻿
-// DataAccess/Entities/StudentEntity.cs
-
-
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Data.Data.Entities
 {
-    public class StudentEntity
+    public class Student
     {
         [Key]
         public int Id { get; set; }
