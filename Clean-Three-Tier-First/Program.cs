@@ -21,6 +21,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 
+//builder.Services.AddControllers()
+//    .AddFluentValidation(options =>
+//    {
+//        options.DisableDataAnnotationsValidation = true;
+
+//        options.RegisterValidatorsFromAssemblyContaining<IAuthService>();
+//    });
+
+
 builder.Services.AddIdentityConfiguration();
 
 
@@ -33,7 +42,7 @@ var app = builder.Build();
 // Custum Middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
 app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
-app.UseMiddleware<RateLimitingMiddleware>();// 3. Profiling (measures the time for all subsequent requests)
+app.UseMiddleware<RateLimitingMiddleware>();      // 3. Profiling (measures the time for all subsequent requests)
 
 
 
@@ -109,51 +118,8 @@ app.Run();
  */
 
 
-/*
- 
-
-
-
-
-
-
-using BLL.Services;
-using BLL.Services.Auth;
-using DAL.Intrfices;
-using DAL.Repositreise;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace BLL.Extensions
-{
-
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-        {
-            services.AddScoped<IPatientRepository, PatientRepository>();
-            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-
-            // Services
-            services.AddScoped<PatientService>();
-            services.AddScoped<AppointmentService>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ITokenService, TokenService>();
-
-            // AutoMapper
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-
-            return services;
-        }
-    }
-}
-
-
-
-
-
- */
-
-
 // note : hard code (roles in data) 
 // services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+

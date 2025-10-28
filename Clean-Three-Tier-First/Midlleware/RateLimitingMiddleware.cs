@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Clean_Three_Tier_First.Midlleware
 {
@@ -25,9 +24,12 @@ namespace Clean_Three_Tier_First.Midlleware
             _logger = logger;
         }
 
-        public async Task Invoke(HttpContext context)
+
+        //  The middleware method name should be InvokeAsync or Invoke 
+        public async Task InvokeAsync(HttpContext context)
         {
-            var clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown"; //?. → means “if not null, access this property.” ?? → means “if the result is null, use this value instead.” 
+             
             var now = DateTime.UtcNow;
 
             // Get previous client state or initialize if new
