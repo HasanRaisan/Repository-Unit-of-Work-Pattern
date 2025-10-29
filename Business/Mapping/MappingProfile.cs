@@ -18,11 +18,13 @@ namespace Business.Mapping
                 2 -   DTO (API/Presintation) => Domain (Business) => Entity (Data Access)
              */
 
-            CreateMap<Student, StudentDomain>().ReverseMap();
+            CreateMap<StudentEntity, StudentDomain>().ReverseMap();
             CreateMap<StudentDomain, StudentDTO>().ReverseMap();
+            CreateMap<StudentEntity, StudentDTO>();
 
-            CreateMap<Teacher, TeacherDomain>().ReverseMap();
+            CreateMap<TeacherEntity, TeacherDomain>().ReverseMap();
             CreateMap<TeacherDomain, TeacherDTO>().ReverseMap();
+            
         }
     }
 }

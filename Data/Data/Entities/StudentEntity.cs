@@ -2,7 +2,7 @@
 
 namespace Data.Data.Entities
 {
-    public class Student
+    public class StudentEntity
     {
         [Key]
         public int Id { get; set; }

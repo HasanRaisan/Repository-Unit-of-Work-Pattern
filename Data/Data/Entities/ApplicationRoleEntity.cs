@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Data.Data.Entities
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationRoleEntity : IdentityRole
     {
-        [Required]
-        [MaxLength(200)]
-        public string FullName { get; set; } = string.Empty;
+        [MaxLength(250)]
+        public string? Description { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(150)]
+        public string? CreatedBy { get; set; }
     }
 }
-

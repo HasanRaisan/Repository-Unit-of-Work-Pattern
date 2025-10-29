@@ -9,7 +9,7 @@ namespace Business.Constants
     public class RoleConstants
     {
         public const string Admin = "Admin";
-        public const string User = "User";
-        public const string Teacher = "Doctor";
+        public const string User = "Student";
+        public const string Teacher = "Teacher";
     }
 }

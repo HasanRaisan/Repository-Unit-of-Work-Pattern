@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Data
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public class AppDbContext : IdentityDbContext<ApplicationUserEntity, ApplicationRoleEntity, string>
     {
-        public DbSet<Student> Students { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<StudentEntity> Students { get; set; }
+        public DbSet<TeacherEntity> Teachers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -20,8 +20,8 @@ namespace Data.Data
             base.OnModelCreating(builder);
 
             // Rename main tables
-            builder.Entity<ApplicationUser>().ToTable("Users");
-            builder.Entity<ApplicationRole>().ToTable("Roles");
+            builder.Entity<ApplicationUserEntity>().ToTable("Users");
+            builder.Entity<ApplicationRoleEntity>().ToTable("Roles");
 
             // Rename related tables with explicit generic type <string>
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");

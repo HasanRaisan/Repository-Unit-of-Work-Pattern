@@ -1,5 +1,7 @@
 ﻿using Data.Data;
 using Data.Data.Entities;
+using Data.Repositories.Generic;
+using Data.Repositories.Spesific;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,15 +16,18 @@ namespace Data.Identity
 {
     public static class IdentityExtensions
     {
-        public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services /*, IConfiguration configuration*/ )
+        public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services , IConfiguration configuration )
         {
-            //// Configure DbContext
-            //services.AddDbContext<AppDbContext>(options =>
-            //    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure Identity
+            services.AddDbContext<AppDbContext>(options =>
+                        options.UseSqlServer(
+                        configuration.GetConnectionString("MyConnection"),
+                        b => b.MigrationsAssembly("Data"))
+            );
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+
+
+            services.AddIdentity<ApplicationUserEntity, ApplicationRoleEntity>(options =>
             {
                 options.Password.RequiredLength = 6;
                 options.Password.RequireUppercase = true;

@@ -5,8 +5,8 @@ using Data.Repositories.Generic;
 
 namespace Data.Repositories.Spesific
 {
-    public interface ITeacherRepository : IRepository<Teacher>
+    public interface ITeacherRepository : IRepository<TeacherEntity>
     {
-       Task<IEnumerable<Teacher>> GetTeachersByDepartmentAsync(int Id);
+       Task<IEnumerable<TeacherEntity>> GetTeachersByDepartmentAsync(int Id);
     }
 }

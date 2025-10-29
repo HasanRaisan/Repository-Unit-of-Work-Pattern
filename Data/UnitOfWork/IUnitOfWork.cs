@@ -7,10 +7,10 @@ namespace Data.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<Student> Students { get; }
+        IRepository<StudentEntity> Students { get; }
         ITeacherRepository Teachers { get; }
-        IRepository<ApplicationUser> ApplicationUsers { get; }
-        IRepository<ApplicationRole> ApplicationRoles { get; }
+        IRepository<ApplicationUserEntity> ApplicationUsers { get; }
+        IRepository<ApplicationRoleEntity> ApplicationRoles { get; }
 
         Task<int> SaveChangesAsync();
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Business.Result;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Business.Services.Generic
 {
-    public interface IGenericService<TDTO> where TDTO : class
+    public interface IGenericService<DTO> where DTO : class
     {
-        Task<TDTO?> GetByIDAsync(int id); 
-        Task<IEnumerable<TDTO>> GetAllAsync();
-        Task AddAsync(TDTO DTO);
-        void Update(TDTO DTO);
-        void Delete(TDTO DTO);
+        Task<Result<DTO>> GetByIDAsync(int id); 
+        Task<Result<IEnumerable<DTO>>> GetAllAsync();
+        Task<Result<DTO>> AddAsync(DTO DTO);
+        Result<DTO> Update(DTO DTO);
+        Result<DTO> Delete(DTO DTO);
     }
 }

@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Business.Validation
 {
-    public class StudentDomainValidater : AbstractValidator<StudentDomain>
+    public class StudentDomainValidator : AbstractValidator<StudentDomain>
     {
-        public StudentDomainValidater()
+        public StudentDomainValidator()
         {
 
             RuleFor(student => student.Id)

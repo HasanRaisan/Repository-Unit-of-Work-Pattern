@@ -14,8 +14,8 @@ namespace Data.Identity
 
         public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
         {
-            var RoleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRoleEntity>>();
+            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUserEntity>>();
 
             string[] RoleNames = { "Admin", "Teacher", "Student" };
 
@@ -23,7 +23,7 @@ namespace Data.Identity
             {
                 if (!await RoleManager.RoleExistsAsync(RoleName))
                 {
-                    await RoleManager.CreateAsync(new ApplicationRole { Name = RoleName, Description = $"{RoleName} role" });
+                    await RoleManager.CreateAsync(new ApplicationRoleEntity { Name = RoleName, Description = $"{RoleName} role" });
                 }
             }
 
@@ -33,7 +33,7 @@ namespace Data.Identity
 
             if (AdminUser == null)
             {
-                var user = new ApplicationUser
+                var user = new ApplicationUserEntity
                 {
                     UserName = "admin",
                     Email = AdminEmail,

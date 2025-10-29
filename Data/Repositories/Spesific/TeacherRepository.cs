@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace Data.Repositories.Spesific
 {
 
-    public class TeacherRepository : Repository<Teacher>, ITeacherRepository
+    public class TeacherRepository : Repository<TeacherEntity>, ITeacherRepository
     {
         public TeacherRepository(AppDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Teacher>> GetTeachersByDepartmentAsync(int DepartmentId)
+        public async Task<IEnumerable<TeacherEntity>> GetTeachersByDepartmentAsync(int DepartmentId)
         {
             return await _context.Teachers
                                  .Where(t => t.DepartmentId == DepartmentId)

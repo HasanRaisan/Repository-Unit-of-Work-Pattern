@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace Business.Validation
 {
-    public class TeacherDomainValidater : AbstractValidator<TeacherDomain>
+    public class TeacherDomainValidator : AbstractValidator<TeacherDomain>
     {
-        public TeacherDomainValidater()
+        public TeacherDomainValidator()
         {
             RuleFor(teacher => teacher.Id)
                 .GreaterThan(0).When(teacher => teacher.Id != 0).
