@@ -1,8 +1,11 @@
 ﻿using Clean_Three_Tier_First.Midlleware;
 using Data.Data;
 using Data.Identity;
-using Data.UnitOfWork;
+using Business.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using Business.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +17,6 @@ builder.Services.AddSwaggerGen();
 
 
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("MyConnection"),
-        b => b.MigrationsAssembly("Data"))
-);
-
-
 //builder.Services.AddControllers()
 //    .AddFluentValidation(options =>
 //    {
@@ -30,7 +26,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //    });
 
 
-builder.Services.AddIdentityConfiguration();
+builder.Services.AddIdentityConfiguration(builder.Configuration); /// Data Access
+builder.Services.AddApplicationServices(); // Business
 
 
 
