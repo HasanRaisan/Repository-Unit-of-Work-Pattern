@@ -11,7 +11,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Business.Services
+namespace Business.Extensions
 {
     public static class ServiceCollectionExtensions
     {

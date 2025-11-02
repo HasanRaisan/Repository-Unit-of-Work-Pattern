@@ -1,11 +1,12 @@
 ﻿using Clean_Three_Tier_First.Midlleware;
 using Data.Data;
 using Data.Identity;
-using Business.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
 using Business.Services.Auth;
+using Data.Extensions;
+using Business.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +118,7 @@ app.Run();
 
 // note : hard code (roles in data) 
 // services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// check save point 
 
 
 

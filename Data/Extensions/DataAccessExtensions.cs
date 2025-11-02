@@ -12,9 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Identity
+namespace Data.Extensions
 {
-    public static class IdentityExtensions
+    public static class DataAccessExtensions
     {
         public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services , IConfiguration configuration )
         {

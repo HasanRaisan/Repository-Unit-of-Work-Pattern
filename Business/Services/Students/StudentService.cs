@@ -43,7 +43,7 @@ namespace Business.Services.Students
             try
             {
                 await _unitOfWork.Students.AddAsync(studentEntity);
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(); // don't we need to check affected number ??
 
                 var savedDTO = _mapper.Map<StudentDTO>(studentEntity);
                 return new Result<StudentDTO>()
