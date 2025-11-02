@@ -1,10 +1,5 @@
 ﻿using Clean_Three_Tier_First.Midlleware;
-using Data.Data;
 using Data.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using FluentValidation.AspNetCore;
-using Business.Services.Auth;
 using Data.Extensions;
 using Business.Extensions;
 
