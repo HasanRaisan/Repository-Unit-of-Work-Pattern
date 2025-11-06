@@ -1,122 +1,136 @@
-﻿using Business.Constants;
+﻿using AutoMapper;
+using Business.Constants;
 using Business.Domain.Auth;
+using Business.Domains.Core;
+using Business.DTOs.Identity;
+using Business.DTOs.Student;
+using Business.Result;
+using Data.Data.Entities;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Business.Services.Auth
 {
-    //public class AuthService : IAuthService
-    //{
-    //    // Dependencies for Identity Management
-    //    private readonly UserManager<IdentityUser> _userManager;
-    //    private readonly SignInManager<IdentityUser> _signInManager;
+    public class AuthService : IAuthService
+    {
+        // Dependencies for Identity Management
+        private readonly UserManager<ApplicationUserEntity> _userManager;
+        private readonly SignInManager<ApplicationUserEntity> _signInManager;
+        private readonly IMapper _mapper;
+        private readonly IValidator<RegisterDomain> _validator;
 
-    //    // Dependency for Token Generation (following SRP)
-    //    private readonly ITokenService _tokenService;
+        // Dependency for Token Generation (following SRP)
+        private readonly ITokenService _tokenService;
 
-    //    public AuthService(
-    //        UserManager<IdentityUser> userManager,
-    //        SignInManager<IdentityUser> signInManager,
-    //        ITokenService tokenService)
-    //    {
-    //        _userManager = userManager;
-    //        _signInManager = signInManager;
-    //        _tokenService = tokenService;
-    //    }
+        public AuthService(
+            UserManager<ApplicationUserEntity> userManager,
+            SignInManager<ApplicationUserEntity> signInManager,
+            IMapper mapper,
+            IValidator<RegisterDomain> validator,
+            ITokenService tokenService)
+        {
+            _userManager = userManager;
+            this._mapper = mapper;
+            this._validator = validator;
+            _tokenService = tokenService;
+            _signInManager = signInManager;
+        }
 
-    //    public async Task<AuthResultDomain> Login(LoginDomain model)
-    //    {
-    //        // 1. Check user credentials using Identity SignInManager
-    //        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
 
-    //        if (!result.Succeeded)
-    //        {
-    //            return new AuthResultDomain
-    //            {
-    //                Success = false,
-    //                Message = "Invalid login attempt. Check email or password."
-    //            };
-    //        }
 
-    //        // 2. Retrieve user object and roles
-    //        var user = await _userManager.FindByEmailAsync(model.Email)
-    //                   ?? throw new InvalidOperationException("User not found after successful sign-in.");
-    //        var roles = await _userManager.GetRolesAsync(user);
+        public async Task<Result<AuthResultDTO>> LoginAsync(LoginDTO loginDTO)
+        {
+            var userDomain = _mapper.Map<LoginDomain>(loginDTO);
 
-    //        // 3. Generate tokens using the dedicated service
-    //        var jwtToken = _tokenService.GenerateJwtToken(user, roles.ToList());
-    //        var refreshToken = _tokenService.GenerateRefreshToken();
+            var user = await _userManager.FindByEmailAsync(userDomain.Email!);
 
-    //        // NOTE: In a real app, the RefreshToken should be saved to the database here.
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userDomain.Password!))
+            {
+                return new Result<AuthResultDTO>
+                {
+                    IsSuccess = false,
+                    Errors = new List<string> { "Invalid email or password." } 
+                };
+            }
+            
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
-    //        return new AuthResultDomain
-    //        {
-    //            Success = true,
-    //            Message = "Login successful.",
-    //            Token = jwtToken,
-    //            RefreshToken = refreshToken
-    //        };              
-    //    }
+            var authResult = _tokenService.CreateToken((ApplicationUserEntity)user, roles.ToList(), userClaims.ToList());
 
-    //    public async Task<AuthResultDomain> Register(RegisterDomain model)
-    //    {
-    //        // 1. Basic validation (can be done better with FluentValidation or Data Annotations)
-    //        if (model.Password != model.ConfirmPassword)
-    //        {
-    //            return new AuthResultDomain { Success = false, Message = "Password and confirmation password do not match." };
-    //        }
+            var authDTO = new AuthResultDTO
+            {
+                IsAuthenticated = true,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Role = [.. roles],
+                Token = authResult.Token, 
+                Expiration = authResult.Expiration,
+                Message = "Login successful"
+            };
 
-    //        // 2. Create the new user object
-    //        var newUser = new IdentityUser
-    //        {
-    //            UserName = model.Email,
-    //            Email = model.Email,
-    //            // Assuming FullName is needed in ApplicationUser, not IdentityUser.
-    //        };
+            return new Result<AuthResultDTO>
+            {
+                IsSuccess = true,
+                Data = authDTO
+            };
+        }
 
-    //        // 3. Create user in the database
-    //        var result = await _userManager.CreateAsync(newUser, model.Password);
+        public async Task<Result<AuthResultDTO>> RegisterAsync(RegisterDTO registerDTO)
+        {
+            var registerDomain = _mapper.Map<RegisterDomain>(registerDTO);
 
-    //        if (!result.Succeeded)
-    //        {
-    //            // Join all errors into a single message
-    //            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-    //            return new AuthResultDomain { Success = false, Message = $"User creation failed: {errors}" };
-    //        }
+            var validationResult = await _validator.ValidateAsync(registerDomain);
 
-    //        // 4. Assign default role (e.g., 'User')
-    //        await _userManager.AddToRoleAsync(newUser, RoleConstants.User);
+            if (!validationResult.IsValid)
+            {
+                return new Result<AuthResultDTO>()
+                {
+                    IsSuccess = false,
+                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
 
-    //        return new AuthResultDomain { Success = true, Message = "User registered successfully. Default role assigned." };
-    //    }
+            var userEntity = _mapper.Map<ApplicationUserEntity>(registerDomain);
+            userEntity.EmailConfirmed = true;
 
-    //    public async Task<AuthResultDomain> AssignRole(AssignRoleDomain model)
-    //    {
-    //        // 1. Find the target user
-    //        var user = await _userManager.FindByIdAsync(model.UserId);
-    //        if (user == null)
-    //        {
-    //            return new AuthResultDomain { Success = false, Message = "User not found." };
-    //        }
+            var result = await _userManager.CreateAsync(user: userEntity, registerDomain.Password!);
 
-    //        // 2. Check if the role exists (optional but recommended)
-    //        // This would require injecting RoleManager<IdentityRole>
+            if (!result.Succeeded)
+            {
+                return new Result<AuthResultDTO>
+                {
+                    IsSuccess = false,
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
 
-    //        // 3. Assign the role
-    //        var result = await _userManager.AddToRoleAsync(user, model.RoleName);
+            await _userManager.AddToRoleAsync(userEntity, RoleConstants.Student );
 
-    //        if (!result.Succeeded)
-    //        {
-    //            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-    //            return new AuthResultDomain { Success = false, Message = $"Failed to assign role: {errors}" };
-    //        }
+            var jwtTokenResult = _tokenService.CreateToken(
+            userEntity,
+            new List<string> { "Student" },
+            new List<Claim>() );
 
-    //        return new AuthResultDomain { Success = true, Message = $"Role '{model.RoleName}' assigned successfully." };
-    //    }
-    //}
+            var authResultDTO = new AuthResultDTO
+            {
+                IsAuthenticated = true,
+                UserName = userEntity.UserName ?? string.Empty,
+                Email = userEntity.Email ?? string.Empty,
+                Role = ["Student"],
+                Token = jwtTokenResult.Token,
+                Expiration = jwtTokenResult.Expiration,
+                Message = "Registration successful"
+            };
 
-}
+            return new Result<AuthResultDTO>
+            {
+                IsSuccess = true,
+                Data = authResultDTO
+            };
+        }
+
+    }
+
+} 

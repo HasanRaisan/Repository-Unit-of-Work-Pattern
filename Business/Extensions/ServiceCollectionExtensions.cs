@@ -1,13 +1,17 @@
-﻿using Business.Domains.Core;
+﻿using Business.Configruration;
+using Business.Domains.Core;
 using Business.Mapping;
 using Business.Services.Auth;
 using Business.Services.Students;
 using Business.Services.Teachers;
 using Business.Validation;
+using Data.Data;
+using Data.Data.Entities;
 using Data.Repositories.Generic;
 using Data.Repositories.Spesific;
 using Data.UnitOfWork;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -23,8 +27,8 @@ namespace Business.Extensions
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            //services.AddScoped<ITokenService, TokenService>();
-            //services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IStudent, StudentService>();
             services.AddScoped<ITeacher, TeacherService>();
@@ -36,8 +40,6 @@ namespace Business.Extensions
 
 
             services.AddValidatorsFromAssemblyContaining<StudentDomainValidator>();
-
-
 
             return services;
         }

@@ -3,6 +3,8 @@ using Business.Domains.Core;
 using Data.Data.Entities;
 using Business.DTOs.Student;
 using Clean_Three_Tier_First.DTOs.Teaher;
+using Business.Domain.Auth;
+using Business.DTOs.Identity;
 
 
 namespace Business.Mapping
@@ -24,7 +26,11 @@ namespace Business.Mapping
 
             CreateMap<TeacherEntity, TeacherDomain>().ReverseMap();
             CreateMap<TeacherDomain, TeacherDTO>().ReverseMap();
-            
+
+            CreateMap<LoginDTO, LoginDomain>();
+            CreateMap<RegisterDTO, RegisterDomain>();
+            CreateMap<RegisterDomain, ApplicationUserEntity>();
+
         }
     }
 }

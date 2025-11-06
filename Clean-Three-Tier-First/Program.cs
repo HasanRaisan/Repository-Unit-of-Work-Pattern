@@ -1,7 +1,17 @@
-﻿using Clean_Three_Tier_First.Midlleware;
-using Data.Identity;
-using Data.Extensions;
+﻿using Business.Configruration;
 using Business.Extensions;
+using Clean_Three_Tier_First;
+using Clean_Three_Tier_First.Midlleware;
+using Data.Extensions;
+using Data.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +23,24 @@ builder.Services.AddSwaggerGen();
 
 
 
+
+
+
+
+
+
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("Jwt")
+);
+
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<IOptions<JwtSettings>>().Value
+);
+
+
+
+
+
 //builder.Services.AddControllers()
 //    .AddFluentValidation(options =>
 //    {
@@ -20,10 +48,35 @@ builder.Services.AddSwaggerGen();
 
 //        options.RegisterValidatorsFromAssemblyContaining<IAuthService>();
 //    });
-
-
 builder.Services.AddIdentityConfiguration(builder.Configuration); /// Data Access
 builder.Services.AddApplicationServices(); // Business
+
+
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = jwtSection["Issuer"],
+        ValidAudience = jwtSection["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]!)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+
+
 
 
 
@@ -32,12 +85,10 @@ var app = builder.Build();
 
 
 
-// Custum Middleware
-app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
-app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
-app.UseMiddleware<RateLimitingMiddleware>();      // 3. Profiling (measures the time for all subsequent requests)
-
-
+////Custum Middleware
+//app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
+//app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
+//app.UseMiddleware<RateLimitingMiddleware>();      // 3. Profiling (measures the time for all subsequent requests)
 
 
 
@@ -49,8 +100,7 @@ using (var scope = app.Services.CreateScope())
     await ApplicationDbContextSeed.SeedRolesAndAdminAsync(service);
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+
 
 
 if (app.Environment.IsDevelopment())
@@ -60,10 +110,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication(); 
 app.UseAuthorization();
+app.MapControllers();     // Implicitly handles routing
 
-app.MapControllers();
 
 app.Run();
 

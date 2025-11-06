@@ -13,9 +13,9 @@ namespace Business.Validation
                 .MaximumLength(200).WithMessage("Full Name cannot exceed 150 characters.");
 
             RuleFor(user => user.UserName)
-                .NotEmpty().WithMessage("User Name is required.")
-                .MinimumLength(2).WithMessage("User Name must be at least 4 characters long.")
-                .MaximumLength(50).WithMessage("User Name cannot exceed 50 characters.");
+                .NotEmpty().WithMessage("Student Name is required.")
+                .MinimumLength(2).WithMessage("Student Name must be at least 4 characters long.")
+                .MaximumLength(50).WithMessage("Student Name cannot exceed 50 characters.");
             // NOTE: You would add an Async rule here to check for uniqueness in the database.
 
             RuleFor(user => user.Email)

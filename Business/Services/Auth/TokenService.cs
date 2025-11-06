@@ -1,10 +1,13 @@
 ﻿using Business.Configruration;
+using Business.DTOs.Identity;
+using Data.Data.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,61 +15,54 @@ using System.Threading.Tasks;
 
 namespace Business.Services.Auth
 {
-    //public class TokenService : ITokenService
-    //{
-    //    private readonly JwtSettings _jwtSettings;
+    public class TokenService : ITokenService
+    {
+        private readonly JwtSettings _jwtSettings;
 
-    //    // Dependency Injection of JwtSettings configuration
-    //    public TokenService(IOptions<JwtSettings> jwtSettings)
-    //    {
-    //        _jwtSettings = jwtSettings.Value;
-    //    }
+        // Dependency Injection of JwtSettings configuration
+        public TokenService(IOptions<JwtSettings> jwtSettings)
+        {
+            _jwtSettings = jwtSettings.Value;
+        }
 
-    //    public string GenerateJwtToken(object user, List<string> roles)
-    //    {
-    //        // --- 1. Prepare Key and Credentials ---
-    //        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-    //        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        public AuthResultDTO  CreateToken(ApplicationUserEntity user, List<string> roles, IList<Claim> userClaims)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier,user.Id?? ""),
+                new Claim(ClaimTypes.Email,user.Email?? ""),
+                new Claim(ClaimTypes.Name,user.UserName?? "")
+            };
 
-    //        // --- 2. Prepare Claims (User Identity Data) ---
-    //        var claims = new List<Claim>
-    //        {
-    //            // Assuming 'user' has properties like Id and Email (from IdentityUser)
-    //            // We cast 'user' to dynamic or the actual Identity type for property access
-    //            new Claim(JwtRegisteredClaimNames.Sub, (user as dynamic)?.Id.ToString() ?? throw new InvalidOperationException("User ID is required.")),
-    //            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-    //            new Claim(JwtRegisteredClaimNames.Email, (user as dynamic)?.Email ?? string.Empty),
-    //        };
+            claims.AddRange(userClaims);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-    //        // Add user roles as claims
-    //        foreach (var role in roles)
-    //        {
-    //            claims.Add(new Claim(ClaimTypes.Role, role));
-    //        }
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
-    //        // --- 3. Create Token Descriptor and Token ---
-    //        var tokenDescriptor = new SecurityTokenDescriptor
-    //        {
-    //            Subject = new ClaimsIdentity(claims),
-    //            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.TokenValidityInMinutes),
-    //            Issuer = _jwtSettings.Issuer,
-    //            Audience = _jwtSettings.Audience,
-    //            SigningCredentials = credentials
-    //        };
+            var token = new JwtSecurityToken(
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience, 
+            expires: DateTime.Now.AddMinutes(_jwtSettings.Lifetime), 
+            claims: claims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
 
-    //        var tokenHandler = new JwtSecurityTokenHandler();
-    //        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            return new AuthResultDTO
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo,
+                UserName = user.UserName ?? ""
+            };
 
-    //        return tokenHandler.WriteToken(securityToken);
-    //    }
+        }
 
-    //    public string GenerateRefreshToken()
-    //    {
-    //        var randomNumber = new byte[32];
-    //        using var rng = RandomNumberGenerator.Create();
-    //        rng.GetBytes(randomNumber);
-    //        // Convert byte array to a base64 string for storage/transmission
-    //        return Convert.ToBase64String(randomNumber);
-    //    }
-    //}
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            // Convert byte array to a base64 string for storage/transmission
+            return Convert.ToBase64String(randomNumber);
+        }
+    }
 }

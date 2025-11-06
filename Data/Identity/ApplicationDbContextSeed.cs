@@ -17,7 +17,7 @@ namespace Data.Identity
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRoleEntity>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUserEntity>>();
 
-            string[] RoleNames = { "Admin", "Teacher", "Student" };
+            string[] RoleNames = { "Admin", "Teacher", "Student", "User" };
 
             foreach (var RoleName in RoleNames)
             {
