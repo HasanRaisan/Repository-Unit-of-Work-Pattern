@@ -30,11 +30,11 @@ TeacherStudentAPI
 |    |-- TeacherStudentAPI.http
 |    |
 |-- Business
-|    |-- Configruration  
+|    |-- Configruration
 |    |      | -- JwtSettings.cs
-|    |-- Constants  
-|    |      | -- RoleConstants.cs 
-|    |- - - - DTOs  
+|    |-- Constants
+|    |      | -- RoleConstants.cs
+|    |- - - - DTOs
 |    |      | -- Identity
 |    |      |       |-- AssignRoleDTO.cs
 |    |      |       |-- LoginDTO.cs
@@ -43,14 +43,14 @@ TeacherStudentAPI
 |    |      |       |-- StudentDTO.cs
 |    |      | -- Teacher
 |    |      |       |-- TeacherDTO.cs
-|    |- - Extensions  
+|    |- - Extensions
 |    |      | -- ServiceCollectionExtensions.cs
-|    |- - Mapping  
+|    |- - Mapping
 |    |      | -- MappingProfile.cs
-|    |- - Result  
+|    |- - Result
 |    |      | -- AuthResult.cs
 |    |      | -- Result.cs
-|    |- - Services  
+|    |- - Services
 |    |      | -- Auth
 |    |      |     | -- IAuthService.cs
 |    |      |     | -- AuthService.cs
@@ -64,11 +64,11 @@ TeacherStudentAPI
 |    |      | -- Teacher
 |    |      |     | -- ITeacher.cs
 |    |      |     | -- TeacherService.cs
-|    |- - Validation  
+|    |- - Validation
 |    |      | -- RegisterDomainValidator.cs
 |    |      | -- StudentDomainValidator.cs
 |    |      | -- TeacherDomainValidator.cs
-|    |- - Domains  
+|    |- - Domains
 |    |      | -- Auth
 |    |      |     | -- AssignRoleDomain.cs
 |    |      |     | -- LoginDomain.cs
@@ -90,7 +90,7 @@ TeacherStudentAPI
 |    |-- Identity
 |    |      |-- ApplicationDbContextSeed.cs
 |    |-- Migrations
-|    |- - Repositories  
+|    |- - Repositories
 |    |      | -- Generic
 |    |      |     | -- IRepository.cs
 |    |      |     | -- Repository.cs
@@ -133,19 +133,22 @@ TeacherStudentAPI
 ## 🧩 How to Run
 
 1. **Clone the repository**
+
    ```bash
-   git clone https://github.com/yourusername/TeacherStudentAPI.git
+   git clone https://github.com/HasanRaisan/TeacherStudent-Repository-Unit-of-Work-Pattern.git
    cd TeacherStudentAPI
    ```
 
 2. **Update database connection string** in `API/appsettings.json`
 
 3. **Apply migrations**
+
    ```bash
    Update-Database
    ```
 
 4. **Run the API**
+
    ```bash
    dotnet run --project API
    ```
