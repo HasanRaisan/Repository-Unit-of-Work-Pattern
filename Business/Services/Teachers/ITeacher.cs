@@ -1,4 +1,5 @@
 ﻿using Business.Domains.Core;
+using Business.Result;
 using Business.Services.Generic;
 using Clean_Three_Tier_First.DTOs.Teaher;
 using System;
@@ -11,7 +12,7 @@ namespace Business.Services.Teachers
 {
     public interface ITeacher : IGenericService<TeacherDTO>
     {
-        Task<IEnumerable<TeacherDTO>> GetTeachersByDepartmentAsync(int Id);
+        Task<Result<IEnumerable<TeacherDTO>>> GetTeachersByDepartmentAsync(int Id);
 
     }
 }

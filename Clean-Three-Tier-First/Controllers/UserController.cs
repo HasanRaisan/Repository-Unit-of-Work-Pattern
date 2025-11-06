@@ -18,8 +18,9 @@ namespace Clean_Three_Tier_First.Controllers
         }
 
 
+
         [HttpPost("register")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthResultDTO))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Result<>))]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
@@ -33,8 +34,11 @@ namespace Clean_Three_Tier_First.Controllers
             return Ok(result.Data);
         }
 
+
+
+
         [HttpPost("login")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthResultDTO))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthResult))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(Result<>))]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
@@ -47,5 +51,24 @@ namespace Clean_Three_Tier_First.Controllers
        
             return Ok(result.Data);
         }
+
+
+
+        [HttpPost("assignRole")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // For not admin
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleDTO assignRoleDTO)
+        {
+            var result = await _authService.AssignRoleAsync(assignRoleDTO);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { Errors = result.Errors });
+            }
+
+            return Ok(result.Data);
         }
+    }
 }

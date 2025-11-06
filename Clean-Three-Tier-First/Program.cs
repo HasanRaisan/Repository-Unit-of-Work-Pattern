@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,13 +38,9 @@ builder.Services.AddSingleton(sp =>
 
 
 
-//builder.Services.AddControllers()
-//    .AddFluentValidation(options =>
-//    {
+
 //        options.DisableDataAnnotationsValidation = true;
 
-//        options.RegisterValidatorsFromAssemblyContaining<IAuthService>();
-//    });
 builder.Services.AddIdentityConfiguration(builder.Configuration); /// Data Access
 builder.Services.AddApplicationServices(); // Business
 
@@ -85,10 +78,10 @@ var app = builder.Build();
 
 
 
-////Custum Middleware
-//app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
-//app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
-//app.UseMiddleware<RateLimitingMiddleware>();      // 3. Profiling (measures the time for all subsequent requests)
+//Custum Middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // 1. Exception handling (catches all unhandled errors)
+app.UseMiddleware<AdvancedProfilingMiddleware>(); // 2. Rate limiting (can be placed before Profiling if you want to block excessive requests first)
+app.UseMiddleware<RateLimitingMiddleware>();      // 3. Profiling (measures the time for all subsequent requests)
 
 
 

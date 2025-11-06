@@ -26,6 +26,7 @@ namespace Business.Mapping
 
             CreateMap<TeacherEntity, TeacherDomain>().ReverseMap();
             CreateMap<TeacherDomain, TeacherDTO>().ReverseMap();
+            CreateMap<TeacherEntity, TeacherDTO>();
 
             CreateMap<LoginDTO, LoginDomain>();
             CreateMap<RegisterDTO, RegisterDomain>();

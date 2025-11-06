@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business.DTOs.Identity
+namespace Business.Result
 {
-    public class AuthResultDTO
+    public class AuthResult
     {
         public string Message { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;

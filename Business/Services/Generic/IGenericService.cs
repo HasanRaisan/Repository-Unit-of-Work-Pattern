@@ -12,7 +12,7 @@ namespace Business.Services.Generic
         Task<Result<DTO>> GetByIDAsync(int id); 
         Task<Result<IEnumerable<DTO>>> GetAllAsync();
         Task<Result<DTO>> AddAsync(DTO DTO);
-        Result<DTO> Update(DTO DTO);
-        Result<DTO> Delete(DTO DTO);
+        Task<Result<DTO>> UpdateAsync(DTO DTO);
+        Task<Result<bool>> DeleteAsync(int ID);
     }
 }

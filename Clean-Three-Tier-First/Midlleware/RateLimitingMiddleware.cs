@@ -46,7 +46,7 @@ namespace Clean_Three_Tier_First.Midlleware
                 count++;
             }
 
-            // Update the dictionary
+            // UpdateAsync the dictionary
             _clients[clientIp] = (count, lastRequest);
 
             // If client exceeded max requests, return 429
