@@ -1,12 +1,10 @@
 ﻿using Business.Constants;
 using Business.DTOs.Student;
 using Business.Services.Students;
-using Clean_Three_Tier_First.DTOs.Teaher;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Clean_Three_Tier_First.Controllers
+namespace TeacherStudentAPI.Controllers
 {
     [Route("api/student")]
     [ApiController]

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Business.Domains.Core;
+using Domain.Entities.Core;
 using Data.Data.Entities;
 using Business.DTOs.Student;
-using Clean_Three_Tier_First.DTOs.Teaher;
-using Business.Domain.Auth;
+using Business.DTOs.Teaher;
+using Domain.Entities.Auth;
 using Business.DTOs.Identity;
 
 
@@ -15,9 +15,9 @@ namespace Business.Mapping
         {
             /*
              Mapping Operation: 
-                1 -   Entity (Data Access) => Domain (Business) => DTO (API/Presintation) 
+                1 -   Entity (Data Access) => Entities (Business) => DTO (API/Presintation) 
 
-                2 -   DTO (API/Presintation) => Domain (Business) => Entity (Data Access)
+                2 -   DTO (API/Presintation) => Entities (Business) => Entity (Data Access)
              */
 
             CreateMap<StudentEntity, StudentDomain>().ReverseMap();

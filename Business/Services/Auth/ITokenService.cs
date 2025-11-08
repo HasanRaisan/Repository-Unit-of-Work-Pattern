@@ -1,4 +1,4 @@
-﻿using Business.Result;
+﻿using Business.Results;
 using Data;
 using Data.Data.Entities;
 using System.IdentityModel.Tokens.Jwt;

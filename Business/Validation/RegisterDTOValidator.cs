@@ -1,11 +1,11 @@
-﻿using Business.Domain.Auth;
+﻿using Business.DTOs.Identity;
 using FluentValidation;
 
 namespace Business.Validation
 {
-    public class RegisterDomainValidator : AbstractValidator<RegisterDomain>
+    public class RegisterDTOValidator : AbstractValidator<RegisterDTO>
     {
-        public RegisterDomainValidator()
+        public RegisterDTOValidator()
         {
             RuleFor(user => user.FullName)
                 .NotEmpty().WithMessage("Full Name is required.")
@@ -17,7 +17,7 @@ namespace Business.Validation
                 .MinimumLength(2).WithMessage("Student Name must be at least 4 characters long.")
                 .MaximumLength(50).WithMessage("Student Name cannot exceed 50 characters.");
             // NOTE: You would add an Async rule here to check for uniqueness in the database.
-
+            
             RuleFor(user => user.Email)
                 .NotEmpty().WithMessage("Email address is required.")
                 .EmailAddress().WithMessage("A valid email address is required.");

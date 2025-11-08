@@ -65,18 +65,24 @@ TeacherStudentAPI
 |    |      |     | -- ITeacher.cs
 |    |      |     | -- TeacherService.cs
 |    |- - Validation
+|    |      | -- LoginDTOValidator.cs
 |    |      | -- RegisterDomainValidator.cs
 |    |      | -- StudentDomainValidator.cs
 |    |      | -- TeacherDomainValidator.cs
-|    |- - Domains
-|    |      | -- Auth
-|    |      |     | -- AssignRoleDomain.cs
+|    |      |
+|-- Domain
+|    | -- Entites
+|    |      |-- Auth
+|    |      |     |-- AssignRoleDomain.cs
 |    |      |     | -- LoginDomain.cs
 |    |      |     | -- RegisterDomain.cs
 |    |      | -- Core
 |    |      |     | -- StudentDomain.cs
 |    |      |     | -- TeacherDomain.cs
-|
+|    |      |
+|    | -- Results
+|    |      |-- Result
+|    |      |
 |-- Data
 |    |-- Data
 |    |      |-- Entities

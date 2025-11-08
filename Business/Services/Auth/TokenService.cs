@@ -1,5 +1,5 @@
 ﻿using Business.Configruration;
-using Business.Result;
+using Business.Results;
 using Data.Data.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

@@ -1,12 +1,13 @@
-﻿using Business.Domains.Core;
+﻿using Business.DTOs.Student;
+using Business.DTOs.Teaher;
 using FluentValidation;
 
 
 namespace Business.Validation
 {
-    public class TeacherDomainValidator : AbstractValidator<TeacherDomain>
+    public class TeacherDTOValidator : AbstractValidator<TeacherDTO>
     {
-        public TeacherDomainValidator()
+        public TeacherDTOValidator()
         {
             RuleFor(teacher => teacher.Id)
                 .GreaterThan(0).When(teacher => teacher.Id != 0).

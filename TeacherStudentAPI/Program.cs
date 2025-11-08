@@ -1,7 +1,6 @@
 ﻿using Business.Configruration;
 using Business.Extensions;
-using Clean_Three_Tier_First;
-using Clean_Three_Tier_First.Midlleware;
+using TeacherStudentAPI.Midlleware;
 using Data.Extensions;
 using Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -121,7 +120,7 @@ app.Run();
 |-- Constants      // جديد: للثوابت العامة
 |    |-- RoleConstants.cs  // تم نقل الملف إلى هنا (اختياري)
 |
-|-- Mapping           // لنقل البيانات بين الطبقات (Entities/Domain)
+|-- Mapping           // لنقل البيانات بين الطبقات (Entities/Entities)
 |    |-- // ملفات DTOs هنا (مثل UserDto.cs, AppointmentDto.cs)
 |
 |-- Models         // نماذج الطلب/الاستجابة المستخدمة في الخدمات

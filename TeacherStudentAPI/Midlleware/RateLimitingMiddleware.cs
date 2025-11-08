@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Clean_Three_Tier_First.Midlleware
+namespace TeacherStudentAPI.Midlleware
 {
     /// <summary>
     /// Middleware to limit the number of requests per client IP within a defined time window.

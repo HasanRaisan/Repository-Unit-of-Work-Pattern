@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 
-namespace Clean_Three_Tier_First.Midlleware
+namespace TeacherStudentAPI.Midlleware
 {
 
     /* 

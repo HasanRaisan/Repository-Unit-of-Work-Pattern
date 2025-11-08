@@ -1,11 +1,11 @@
-﻿using Business.Domains.Core;
+﻿using Business.DTOs.Student;
 using FluentValidation;
 
 namespace Business.Validation
 {
-    public class StudentDomainValidator : AbstractValidator<StudentDomain>
+    public class StudentDTOValidator : AbstractValidator<StudentDTO>
     {
-        public StudentDomainValidator()
+        public StudentDTOValidator()
         {
 
             RuleFor(student => student.Id)

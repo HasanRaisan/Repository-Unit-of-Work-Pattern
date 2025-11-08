@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Clean_Three_Tier_First.Midlleware
+namespace TeacherStudentAPI.Midlleware
 {
     /// <summary>
     /// Middleware to log detailed performance metrics for each HTTP request.

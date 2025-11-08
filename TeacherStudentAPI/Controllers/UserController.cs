@@ -1,10 +1,10 @@
 ﻿using Business.DTOs.Identity;
-using Business.Result;
+using Business.Results;
 using Business.Services.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Clean_Three_Tier_First.Controllers
+namespace TeacherStudentAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

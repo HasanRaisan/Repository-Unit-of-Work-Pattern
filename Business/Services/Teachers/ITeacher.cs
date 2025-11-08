@@ -1,7 +1,6 @@
-﻿using Business.Domains.Core;
-using Business.Result;
+﻿using Business.Results;
 using Business.Services.Generic;
-using Clean_Three_Tier_First.DTOs.Teaher;
+using Business.DTOs.Teaher;
 using System;
 using System.Collections.Generic;
 using System.Linq;

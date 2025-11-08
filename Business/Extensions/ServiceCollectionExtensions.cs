@@ -1,5 +1,4 @@
 ﻿using Business.Configruration;
-using Business.Domains.Core;
 using Business.Mapping;
 using Business.Services.Auth;
 using Business.Services.Students;
@@ -39,7 +38,8 @@ namespace Business.Extensions
             }, typeof(ServiceCollectionExtensions).Assembly);
 
 
-            services.AddValidatorsFromAssemblyContaining<StudentDomainValidator>();
+            services.AddValidatorsFromAssemblyContaining<StudentDTOValidator>();
+
 
             return services;
         }
