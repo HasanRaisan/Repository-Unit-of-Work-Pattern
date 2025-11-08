@@ -1,7 +1,8 @@
 # 🎓 TeacherStudentAPI
 
-A clean and well-structured **Three-Tier ASP.NET Core Web API** project for managing **Teachers, Students, and Users (with Roles and Authentication)**.  
-It follows best practices for **Clean Architecture**, **Separation of Concerns**, and **Dependency Injection**.
+A **scalable** and **maintainable** **ASP.NET Core Web API** designed using **Clean Architecture** principles, ensuring clear **separation of responsibilities** across all layers.
+
+The project supports **Teacher**, **Student**, and **User Management**, including **Authentication** and **Role-Based Authorization**, and follows best practices for **Separation of Concerns** and **Dependency Injection**.
 
 ---
 
