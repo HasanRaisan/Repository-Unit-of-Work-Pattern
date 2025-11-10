@@ -30,7 +30,7 @@ TeacherStudentAPI
 |    |-- Program
 |    |-- TeacherStudentAPI.http
 |    |
-|-- Business
+|-- Application
 |    |-- Configruration
 |    |      | -- JwtSettings.cs
 |    |-- Constants
@@ -84,7 +84,7 @@ TeacherStudentAPI
 |    | -- Results
 |    |      |-- Result
 |    |      |
-|-- Data
+|-- Infrastructure
 |    |-- Data
 |    |      |-- Entities
 |    |      |      |-- ApplicationRoleEntity.cs
@@ -93,7 +93,7 @@ TeacherStudentAPI
 |    |      |      |-- TeacherEntity.cs
 |    |      |-- AppDbContext.cs
 |    |-- Extensions
-|    |      |-- DataAccessExtensions.cs
+|    |      |-- InfrastructureExtensions.cs
 |    |-- Identity
 |    |      |-- ApplicationDbContextSeed.cs
 |    |-- Migrations
@@ -121,7 +121,7 @@ TeacherStudentAPI
 - ✅ FluentValidation for input validation
 - ✅ Centralized Exception Handling Middleware
 - ✅ Rate Limiting & Request Profiling Middleware
-- ✅ Repository + Unit of Work pattern for data access
+- ✅ Repository + Unit of Work pattern for Infrastructure
 
 ---
 
@@ -142,7 +142,8 @@ TeacherStudentAPI
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/HasanRaisan/TeacherStudent-Repository-Unit-of-Work-Pattern.git
+   git clone
+   https://github.com/HasanRaisan/TeacherStudent-Clean-Architecture-.git
    cd TeacherStudentAPI
    ```
 

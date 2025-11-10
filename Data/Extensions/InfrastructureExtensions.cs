@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Data.Extensions
 {
-    public static class DataAccessExtensions
+    public static class InfrastructureExtensions
     {
         public static IServiceCollection AddIdentityConfiguration(this IServiceCollection services , IConfiguration configuration )
         {
