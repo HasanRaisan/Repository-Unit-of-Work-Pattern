@@ -143,7 +143,7 @@ TeacherStudentAPI
 
    ```bash
    git clone
-   https://github.com/HasanRaisan/TeacherStudent-Clean-Architecture-.git
+   https://github.com/HasanRaisan/CleanArchitecture_TeacherStudentAPI.git
    cd TeacherStudentAPI
    ```
 

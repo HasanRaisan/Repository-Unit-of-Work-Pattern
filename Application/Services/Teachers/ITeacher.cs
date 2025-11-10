@@ -1,0 +1,17 @@
+﻿using Application.Results;
+using Application.Services.Generic;
+using Application.DTOs.Teaher;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Services.Teachers
+{
+    public interface ITeacher : IGenericService<TeacherDTO>
+    {
+        Task<Result<IEnumerable<TeacherDTO>>> GetTeachersByDepartmentAsync(int Id);
+
+    }
+}

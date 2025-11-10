@@ -1,6 +1,6 @@
-﻿using Business.DTOs.Identity;
-using Business.Results;
-using Business.Services.Auth;
+﻿using Application.DTOs.Identity;
+using Application.Results;
+using Application.Services.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

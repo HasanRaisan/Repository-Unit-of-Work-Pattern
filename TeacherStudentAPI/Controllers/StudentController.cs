@@ -1,6 +1,6 @@
-﻿using Business.Constants;
-using Business.DTOs.Student;
-using Business.Services.Students;
+﻿using Application.Constants;
+using Application.DTOs.Student;
+using Application.Services.Students;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,8 +1,8 @@
-﻿using Business.Configruration;
-using Business.Extensions;
+﻿using Application.Configruration;
+using Application.Extensions;
 using TeacherStudentAPI.Midlleware;
-using Data.Extensions;
-using Data.Identity;
+using Infrastructure.Extensions;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
