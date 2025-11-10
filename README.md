@@ -113,7 +113,7 @@ TeacherStudentAPI
 
 ## 🚀 Features
 
-- ✅ Clean architecture (**API**, **Business**, **Domain**, **Data**)
+- ✅ Clean architecture (**API**, **Application**, **Domain**, **Infrastructure**)
 - ✅ Authentication & Authorization using **ASP.NET Identity**
 - ✅ Role-based Access Control (`Admin`, `Teacher`, `Student`)
 - ✅ JWT Token Authentication
