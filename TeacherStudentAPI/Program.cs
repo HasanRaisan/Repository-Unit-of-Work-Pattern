@@ -110,49 +110,6 @@ app.MapControllers();     // Implicitly handles routing
 app.Run();
 
 
-/*
-
- BusinessLayer
-|
-|-- Configuration  // جديد: لإعدادات التطبيق (مثل JWT)
-|    |-- JwtSettings.cs  // تغيير الاسم ليعكس مجموعة الإعدادات (صيغة الجمع)
-|
-|-- Constants      // جديد: للثوابت العامة
-|    |-- RoleConstants.cs  // تم نقل الملف إلى هنا (اختياري)
-|
-|-- Mapping           // لنقل البيانات بين الطبقات (Entities/Entities)
-|    |-- // ملفات DTOs هنا (مثل UserDto.cs, AppointmentDto.cs)
-|
-|-- Models         // نماذج الطلب/الاستجابة المستخدمة في الخدمات
-|    |-- Auth
-|    |    |-- AssignRoleModel.cs
-|    |    |-- AuthResultModel.cs  // تغيير الاسم من AuthModel.cs ليكون أكثر تحديداً
-|    |    |-- LoginModel.cs
-|    |    |-- RegisterModel.cs    // تصحيح إملائي من ReqisterModel.cs
-|    |
-|    |-- AppointmentModel.cs
-|    |-- PatientModel.cs
-|
-|-- Services       // منطق العمل وتطبيق الواجهات
-|    |-- Auth
-|    |    |-- AuthService.cs
-|    |    |-- IAuthService.cs
-|    |    |-- ITokenService.cs
-|    |    |-- TokenService.cs
-|    |
-|    |-- Appointments
-|    |    |-- AppointmentService.cs  // نقل إلى مجلد فرعي
-|    |    |-- IAppointmentService.cs // إضافة الواجهة
-|    |
-|    |-- Patients
-|    |    |-- PatientService.cs    // نقل إلى مجلد فرعي
-|    |    |-- IPatientService.cs     // إضافة الواجهة
-|    |
-|    |-- ServiceCollectionExtensions.cs // لتسجيل الخدمات في حاوية IoC
-
- */
-
-
 // note : hard code (roles in data) 
 // services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // check save point 

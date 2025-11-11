@@ -67,9 +67,9 @@ TeacherStudentAPI
 |    |      |     | -- TeacherService.cs
 |    |- - Validation
 |    |      | -- LoginDTOValidator.cs
-|    |      | -- RegisterDomainValidator.cs
-|    |      | -- StudentDomainValidator.cs
-|    |      | -- TeacherDomainValidator.cs
+|    |      | -- RegisterDTOValidator.cs
+|    |      | -- StudentDTOValidator.cs
+|    |      | -- TeacherDTOValidator.cs
 |    |      |
 |-- Domain
 |    | -- Entites
@@ -115,7 +115,7 @@ TeacherStudentAPI
 
 - ✅ Clean architecture (**API**, **Application**, **Domain**, **Infrastructure**)
 - ✅ Authentication & Authorization using **ASP.NET Identity**
-- ✅ Role-based Access Control (`Admin`, `Teacher`, `Student`)
+- ✅ Role-based Access Control (`Admin`, `Teacher`, `Student`, `User`)
 - ✅ JWT Token Authentication
 - ✅ AutoMapper for mapping Entities ↔ DTOs ↔ Domains
 - ✅ FluentValidation for input validation
