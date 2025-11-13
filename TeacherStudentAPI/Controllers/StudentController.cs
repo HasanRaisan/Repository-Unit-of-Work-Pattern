@@ -2,6 +2,7 @@
 using Application.DTOs.Student;
 using Application.Services.Students;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TeacherStudentAPI.Controllers
@@ -21,28 +22,50 @@ namespace TeacherStudentAPI.Controllers
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Teacher}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] StudentDTO studentDTO)
         {
             var result = await StudentService.AddAsync(studentDTO);
 
             if (!result.IsSuccess)
             {
+                var firstError = result.Errors?.FirstOrDefault();
+
+                if (firstError != null && firstError.Contains("InternalDbError"))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new { Errors = new List<string> { "An unexpected server error occurred during data saving." } });
+                }
                 return BadRequest(new { Errors = result.Errors });
             }
 
-            return CreatedAtRoute( "GetStudentById",
-                new { id = result.Data.Id }, result.Data);
+            return CreatedAtRoute( "GetStudentById", new { id = result.Data.Id }, result.Data);
         }
+
+
 
         [HttpGet("all", Name = "GetAllStudent")]
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Teacher}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<StudentDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllStudents()
         {
             var result = await StudentService.GetAllAsync();
-
+            if (!result.IsSuccess)
+            {
+                var firstError = result.Errors?.FirstOrDefault();
+                if (firstError != null && firstError.Contains("InternalDbError"))
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new { Errors = new List<string> { "An unexpected server error occurred during data saving." } });
+                }
+            }
             return Ok(result.Data);
         }
+
+
+
+
 
         [HttpGet("{id}", Name = "GetStudentById")]
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Teacher},{RoleConstants.Student}")]

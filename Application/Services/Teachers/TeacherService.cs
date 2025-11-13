@@ -57,7 +57,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>("An unexpected database error occurred: " + ex.Message);
+                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
             }
 
         }
@@ -93,7 +93,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<bool>($"Database error during deletion: {ex.Message}");
+                return ResultFactory.Fail<bool>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<TeacherDTO>>($"An error occurred while retrieving teachers: {ex.Message}");
+                return ResultFactory.Fail<IEnumerable<TeacherDTO>>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -141,7 +141,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>($"An error occurred while retrieving teacher: {ex.Message}");
+                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -164,9 +164,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<TeacherDTO>>(
-                    $"An error occurred while retrieving teachers for department {departmentId}: {ex.Message}"
-                );
+                return ResultFactory.Fail<IEnumerable<TeacherDTO>>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -228,7 +226,7 @@ Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see the c
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>(new List<string> { $"Database error: {ex.Message}" });
+                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
             }
         }
     }

@@ -66,6 +66,7 @@ TeacherStudentAPI
 |    |      |     | -- ITeacher.cs
 |    |      |     | -- TeacherService.cs
 |    |- - Validation
+|    |      | -- AssignRoleDTOValidator.cs
 |    |      | -- LoginDTOValidator.cs
 |    |      | -- RegisterDTOValidator.cs
 |    |      | -- StudentDTOValidator.cs

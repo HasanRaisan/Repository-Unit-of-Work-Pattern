@@ -53,7 +53,7 @@ namespace Application.Services.Students
             {
                 await _unitOfWork.Students.AddAsync(studentEntity);
 
-                // 5️ Save changes and optionally check affected rows
+                // 5️ Save changes and check affected rows
                 int affectedRows = await _unitOfWork.SaveChangesAsync();
                 if (affectedRows == 0)
                 {
@@ -67,7 +67,8 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<StudentDTO>($"An unexpected database error occurred: {ex.Message}");
+                // Log the erorr
+                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -98,7 +99,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<bool>($"Database error during deletion: {ex.Message}");
+                return ResultFactory.Fail<bool>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -121,7 +122,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<StudentDTO>>($"An error occurred while retrieving students: {ex.Message}");
+                return ResultFactory.Fail<IEnumerable<StudentDTO>>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -145,7 +146,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<StudentDTO>($"An error occurred while retrieving student: {ex.Message}");
+                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
             }
         }
 
@@ -204,7 +205,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<StudentDTO>($"Database error during update: {ex.Message}");
+                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
             }
         }
     }

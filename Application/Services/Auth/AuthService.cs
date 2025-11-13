@@ -22,6 +22,7 @@ namespace Application.Services.Auth
         private readonly IMapper _mapper;
         private readonly IValidator<RegisterDTO> _registerValidator;
         private readonly IValidator<LoginDTO> _loginValidator;
+        private readonly IValidator<AssignRoleDTO> _assignRoleValidator;
         private readonly ITokenService _tokenService;
 
         public AuthService(
@@ -31,12 +32,14 @@ namespace Application.Services.Auth
             IMapper mapper,
             IValidator<RegisterDTO> registerValidator,
             IValidator<LoginDTO> LoginValidator,
+            IValidator<AssignRoleDTO> assignRoleValidator,
             ITokenService tokenService)
         {
             _userManager = userManager;
             this._mapper = mapper;
             this._registerValidator = registerValidator;
             this._loginValidator = LoginValidator;
+            this._assignRoleValidator = assignRoleValidator;
             _tokenService = tokenService;
             _signInManager = signInManager;
             _roleManager = roleManager;
@@ -62,33 +65,41 @@ namespace Application.Services.Auth
                 return ResultFactory.Fail<AuthResult>(domainValidationResult.Errors);
             }
 
-            // 3️ Find user by email
-            var user = await _userManager.FindByEmailAsync(userDomain.Email!);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, userDomain.Password!))
+            try
             {
-                return ResultFactory.Fail<AuthResult>(new List<string> { "Invalid email or password." });
+                // 3️ Find user by email
+                var user = await _userManager.FindByEmailAsync(userDomain.Email!);
+                if (user == null || !await _userManager.CheckPasswordAsync(user, userDomain.Password!))
+                {
+                    return ResultFactory.Fail<AuthResult>(new List<string> { "Invalid email or password." });
+                }
+
+                // 4️ Retrieve user claims and roles
+                var userClaims = await _userManager.GetClaimsAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // 5️ Generate JWT token
+                var authResultToken = _tokenService.CreateToken((ApplicationUserEntity)user, roles.ToList(), userClaims.ToList());
+
+                // 6️ Map to AuthResult DTO
+                var authDTO = new AuthResult
+                {
+                    IsAuthenticated = true,
+                    UserName = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Role = roles.ToList(), // fix: assign roles list
+                    Token = authResultToken.Token,
+                    Expiration = authResultToken.Expiration,
+                    Message = "Login successful"
+                };
+
+                return ResultFactory.Success(authDTO);
+            }
+            catch (Exception ex)
+            {
+                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during the login process.");
             }
 
-            // 4️ Retrieve user claims and roles
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            // 5️ Generate JWT token
-            var authResultToken = _tokenService.CreateToken((ApplicationUserEntity)user, roles.ToList(), userClaims.ToList());
-
-            // 6️ Map to AuthResult DTO
-            var authDTO = new AuthResult
-            {
-                IsAuthenticated = true,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
-                Role = roles.ToList(), // fix: assign roles list
-                Token = authResultToken.Token,
-                Expiration = authResultToken.Expiration,
-                Message = "Login successful"
-            };
-
-            return ResultFactory.Success(authDTO);
         }
         public async Task<Result<AuthResult>> RegisterAsync(RegisterDTO registerDTO)
         {
@@ -115,79 +126,100 @@ namespace Application.Services.Auth
             // 4️ Map Domain to Identity entity
             var userEntity = _mapper.Map<ApplicationUserEntity>(registerDomain);
             userEntity.EmailConfirmed = true; // optional: auto-confirm email
-
-            // 5️ Create user in Identity WITHOUT assigning any role
-            var createResult = await _userManager.CreateAsync(userEntity, registerDomain.Password!);
-            if (!createResult.Succeeded)
+            try
             {
-                var errors = createResult.Errors.Select(e => e.Description).ToList();
-                return ResultFactory.Fail<AuthResult>(errors);
+                // 5️ Create user in Identity WITHOUT assigning any role
+                var createResult = await _userManager.CreateAsync(userEntity, registerDomain.Password!);
+                if (!createResult.Succeeded)
+                {
+                    var errors = createResult.Errors.Select(e => e.Description).ToList();
+                    return ResultFactory.Fail<AuthResult>(errors);
+                }
+
+                // 6 Generate JWT token (optional: empty roles for now)
+                var jwtTokenResult = _tokenService.CreateToken(
+                    userEntity,
+                    new List<string>(), // empty roles
+                    new List<Claim>()   // no extra claims
+                );
+
+                // 7 Map to AuthResult
+                var authResultDTO = new AuthResult
+                {
+                    IsAuthenticated = true,
+                    UserName = userEntity.UserName ?? string.Empty,
+                    Email = userEntity.Email ?? string.Empty,
+                    Role = new List<string>(), // empty roles initially
+                    Token = jwtTokenResult.Token,
+                    Expiration = jwtTokenResult.Expiration,
+                    Message = "Registration successful. Assign roles later."
+                };
+
+                return ResultFactory.Success(authResultDTO);
+            }
+            catch (Exception ex)
+            {
+                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during user registration.");
             }
 
-            // 6 Generate JWT token (optional: empty roles for now)
-            var jwtTokenResult = _tokenService.CreateToken(
-                userEntity,
-                new List<string>(), // empty roles
-                new List<Claim>()   // no extra claims
-            );
-
-            // 7 Map to AuthResult
-            var authResultDTO = new AuthResult
-            {
-                IsAuthenticated = true,
-                UserName = userEntity.UserName ?? string.Empty,
-                Email = userEntity.Email ?? string.Empty,
-                Role = new List<string>(), // empty roles initially
-                Token = jwtTokenResult.Token,
-                Expiration = jwtTokenResult.Expiration,
-                Message = "Registration successful. Assign roles later."
-            };
-
-            return ResultFactory.Success(authResultDTO);
         }
 
 
         public async Task<Result<AuthResult>> AssignRoleAsync(AssignRoleDTO assignRoleDTO)
         {
-            // 1️ Search for the user by ID and check if the role exists
-            var user = await _userManager.FindByIdAsync(assignRoleDTO.UserId!);
-            var roleExists = await _roleManager.RoleExistsAsync(assignRoleDTO.Role!);
-
-            if (user == null || !roleExists)
+            var dtoValidationResult = await _assignRoleValidator.ValidateAsync(assignRoleDTO);
+            if (!dtoValidationResult.IsValid)
             {
-                return ResultFactory.Fail<AuthResult>(new List<string> { "User ID or Role not found." });
-            }
-
-            // 2️ Check if the user already has this role
-            if (await _userManager.IsInRoleAsync(user, assignRoleDTO.Role!))
-            {
-                var alreadyAssigned = new AuthResult
-                {
-                    Message = $"User already has the '{assignRoleDTO.Role}' role.",
-                    UserName = user.UserName!
-                };
-                return ResultFactory.Success(alreadyAssigned);
-            }
-
-            // 3️ Add the role to the user
-            var result = await _userManager.AddToRoleAsync(user, assignRoleDTO.Role!);
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description).ToList();
+                var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return ResultFactory.Fail<AuthResult>(errors);
             }
 
-            // 4️ Prepare success result
-            var authModel = new AuthResult
+            try
             {
-                IsAuthenticated = false, // just role assignment, not login
-                UserName = user.UserName!,
-                Email = user.Email!,
-                Role = new List<string> { assignRoleDTO.Role! }, 
-                Message = $"Role '{assignRoleDTO.Role}' assigned successfully to {user.UserName}."
-            };
+                // 1️ Search for the user by ID and check if the role exists
+                var user = await _userManager.FindByIdAsync(assignRoleDTO.UserId!);
+                var roleExists = await _roleManager.RoleExistsAsync(assignRoleDTO.Role!);
 
-            return ResultFactory.Success(authModel);
+                if (user == null || !roleExists)
+                {
+                    return ResultFactory.Fail<AuthResult>(new List<string> { "User ID or Role not found." });
+                }
+
+                // 2️ Check if the user already has this role
+                if (await _userManager.IsInRoleAsync(user, assignRoleDTO.Role!))
+                {
+                    var alreadyAssigned = new AuthResult
+                    {
+                        Message = $"User already has the '{assignRoleDTO.Role}' role.",
+                        UserName = user.UserName!
+                    };
+                    return ResultFactory.Success(alreadyAssigned);
+                }
+
+                // 3️ Add the role to the user
+                var result = await _userManager.AddToRoleAsync(user, assignRoleDTO.Role!);
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return ResultFactory.Fail<AuthResult>(errors);
+                }
+
+                // 4️ Prepare success result
+                var authModel = new AuthResult
+                {
+                    IsAuthenticated = false, // just role assignment, not login
+                    UserName = user.UserName!,
+                    Email = user.Email!,
+                    Role = new List<string> { assignRoleDTO.Role! },
+                    Message = $"Role '{assignRoleDTO.Role}' assigned successfully to {user.UserName}."
+                };
+
+                return ResultFactory.Success(authModel);
+            }
+            catch(Exception ex)
+            {
+                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during role assignment.");
+            }
         }
     }
 } 
