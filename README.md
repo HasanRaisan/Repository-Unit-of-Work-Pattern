@@ -38,6 +38,7 @@ TeacherStudentAPI
 |    |- - - - DTOs
 |    |      | -- Identity
 |    |      |       |-- AssignRoleDTO.cs
+|    |      |       |-- AuthResultDTO.cs
 |    |      |       |-- LoginDTO.cs
 |    |      |       |-- RegisterDTO.cs
 |    |      | -- Student
@@ -49,8 +50,11 @@ TeacherStudentAPI
 |    |- - Mapping
 |    |      | -- MappingProfile.cs
 |    |- - Result
-|    |      | -- AuthResult.cs
+|    |      | -- Error.cs
+|    |      | -- ErrorType.cs
 |    |      | -- Result.cs
+|    |      | -- ResultFactory.cs
+|    |      | -- ResultToActionMapper.cs
 |    |- - Services
 |    |      | -- Auth
 |    |      |     | -- IAuthService.cs
@@ -114,15 +118,17 @@ TeacherStudentAPI
 
 ## 🚀 Features
 
-- ✅ Clean architecture (**API**, **Application**, **Domain**, **Infrastructure**)
-- ✅ Authentication & Authorization using **ASP.NET Identity**
-- ✅ Role-based Access Control (`Admin`, `Teacher`, `Student`, `User`)
-- ✅ JWT Token Authentication
-- ✅ AutoMapper for mapping Entities ↔ DTOs ↔ Domains
-- ✅ FluentValidation for input validation
-- ✅ Centralized Exception Handling Middleware
-- ✅ Rate Limiting & Request Profiling Middleware
-- ✅ Repository + Unit of Work pattern for Infrastructure
+- ✅ Clean architecture (**API**, **Application**, **Domain**, **Infrastructure**).
+- ✅ Authentication & Authorization using **ASP.NET Identity**.
+- ✅ Role-based Access Control (`Admin`, `Teacher`, `Student`).
+- ✅ JWT Token Authentication.
+- ✅ Result Design Pattern (Result<T>) for predictable business outcome handling.
+- ✅ Automated HTTP Status Code Mapping using custom Result.ToActionResult() extension.
+- ✅ AutoMapper for mapping Entities ↔ DTOs ↔ Domains.
+- ✅ FluentValidation for input validation.
+- ✅ Centralized Exception Handling Middleware.
+- ✅ Rate Limiting & Request Profiling Middleware.
+- ✅ Repository + Unit of Work pattern for Infrastructure.
 
 ---
 
