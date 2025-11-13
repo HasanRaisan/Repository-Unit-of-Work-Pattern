@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Domain.Entities.Core;
-using Application.DTOs.Student;
-using Application.Results;
 using Application.DTOs.Teaher;
 using Infrastructure.Data.Entities;
 using Infrastructure.UnitOfWork;
 using FluentValidation;
+using Application.Results;
 
 namespace Application.Services.Teachers
 {
@@ -15,13 +14,14 @@ namespace Application.Services.Teachers
         private readonly IMapper _mapper;
         private readonly IValidator<TeacherDTO> _validator;
 
+        private const string DbErrorMessage = "An unexpected database error occurred.";
+        private Result<IEnumerable<TeacherDTO>> EmptyList() => ResultFactory.Success(Enumerable.Empty<TeacherDTO>());
         public TeacherService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<TeacherDTO> validator)
         {
             this._unitOfWork = unitOfWork;
             this._mapper = mapper;
             this._validator = validator;
         }
-
         public async Task<Result<TeacherDTO>> AddAsync(TeacherDTO teacherDTO)
         {
             // 1️ DTO validation
@@ -29,7 +29,7 @@ namespace Application.Services.Teachers
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<TeacherDTO>(errors);
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, errors);
             }
 
             // 2️ Map to domain & Domain validation
@@ -37,7 +37,7 @@ namespace Application.Services.Teachers
             var domainValidationResult = teacherDomain.ValidateBusinessRules();
             if (!domainValidationResult.IsSuccess)
             {
-                return ResultFactory.Fail<TeacherDTO>(domainValidationResult.Errors);
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
             }
 
             // 3️  Map to entity and save
@@ -49,7 +49,7 @@ namespace Application.Services.Teachers
 
                 if (affectedRows == 0)
                 {
-                    return ResultFactory.Fail<TeacherDTO>("Failed to save the teacher to the database.");
+                    return ResultFactory.Fail<TeacherDTO>(ErrorType.Conflict, "Failed to save the teacher to the database.");
                 }
 
                 var savedDTO = _mapper.Map<TeacherDTO>(teacherEntity);
@@ -57,19 +57,21 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
 
         }
-
         public async Task<Result<bool>> DeleteAsync(int ID)
         {
+            if (ID <= 0)
+                return ResultFactory.Fail<bool>(ErrorType.ValidationError, "Invalid ID value.");
+
             // 1️ Try to get the teacher entity by ID
             var teacherToDelete = await _unitOfWork.Teachers.GetByIdAsync(ID);
 
             if (teacherToDelete == null)
             {
-                return ResultFactory.Fail<bool>($"Teacher with ID {ID} not found.");
+                return ResultFactory.Fail<bool>(ErrorType.NotFound, $"Teacher with ID {ID} not found.");
             }
 
             try
@@ -88,15 +90,14 @@ namespace Application.Services.Teachers
                 else
                 {
                     // Deletion failed without exception
-                    return ResultFactory.Fail<bool>($"Deletion failed. No rows affected for ID {ID}.");
+                    return ResultFactory.Fail<bool>(ErrorType.Conflict, $"Deletion failed. No rows affected for ID {ID}.");
                 }
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<bool>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<bool>(ErrorType.InternalError, DbErrorMessage);
             }
         }
-
         public async Task<Result<IEnumerable<TeacherDTO>>> GetAllAsync()
         {
             try
@@ -107,7 +108,7 @@ namespace Application.Services.Teachers
                 // 2️ If no teachers found, return empty list as success
                 if (teacherEntities == null || !teacherEntities.Any())
                 {
-                    return ResultFactory.Success(Enumerable.Empty<TeacherDTO>());
+                    return EmptyList();
                 }
 
                 // 3️ Map entities to DTOs
@@ -118,20 +119,22 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<TeacherDTO>>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<IEnumerable<TeacherDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
-
-        public async Task<Result<TeacherDTO>> GetByIDAsync(int id)
+        public async Task<Result<TeacherDTO>> GetByIDAsync(int ID)
         {
+            if (ID <= 0)
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, "Invalid ID value.");
+
             try
             {
-                var teacherEntity = await _unitOfWork.Teachers.GetByIdAsync(id);
+                var teacherEntity = await _unitOfWork.Teachers.GetByIdAsync(ID);
 
                 //  If teacher not found, return failure result
                 if (teacherEntity == null)
                 {
-                    return ResultFactory.Fail<TeacherDTO>($"Teacher with ID {id} not found.");
+                    return ResultFactory.Fail<TeacherDTO>(ErrorType.NotFound, $"Teacher with ID {ID} not found.");
                 }
 
                 //  Map entity to DTO
@@ -141,12 +144,13 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
-
         public async Task<Result<IEnumerable<TeacherDTO>>> GetTeachersByDepartmentAsync(int departmentId)
         {
+            if (departmentId <= 0)
+                return ResultFactory.Fail<IEnumerable<TeacherDTO >> (ErrorType.ValidationError, "Invalid ID value.");
             try
             {
                 // 1️ Retrieve all teacher entities for the given department
@@ -154,7 +158,7 @@ namespace Application.Services.Teachers
 
                 if (teacherEntities == null || !teacherEntities.Any())
                 {
-                    return ResultFactory.Success(Enumerable.Empty<TeacherDTO>());
+                    return EmptyList();
                 }
 
                 // 2 Map entities to DTOs
@@ -164,16 +168,15 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<TeacherDTO>>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<IEnumerable<TeacherDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
-
         public async Task<Result<TeacherDTO>> UpdateAsync(TeacherDTO DTO)
         {
             // 1️ Check if teacher exists in the database
             var existing = await _unitOfWork.Teachers.GetByIdAsync(DTO.Id);
             if (existing == null)
-                return ResultFactory.Fail<TeacherDTO>(new List<string> { "Teacher not found." });
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.NotFound, "Teacher not found.");
 
 
             // 2 DTO validation using FluentValidation
@@ -181,7 +184,7 @@ namespace Application.Services.Teachers
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<TeacherDTO>(errors);
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, errors);
             }
 
             // 3 Map DTO to Domain
@@ -192,7 +195,7 @@ namespace Application.Services.Teachers
             var domainValidationResult = teacherDomain.ValidateBusinessRules();
             if (!domainValidationResult.IsSuccess)
             {
-                return ResultFactory.Fail<TeacherDTO>(domainValidationResult.Errors);
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
             }
 
             try
@@ -215,7 +218,7 @@ Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see the c
                 int affectedRows = await _unitOfWork.SaveChangesAsync();
 
                 if (affectedRows == 0)
-                    return ResultFactory.Fail<TeacherDTO>("Update failed. No corresponding teacher found or no changes detected.");
+                    return ResultFactory.Fail<TeacherDTO>(ErrorType.Conflict, "Update failed. No rows affected.");
                 
                 // 7️ Retrieve the updatedEntity entity to return fresh data
                 var updatedEntity = await _unitOfWork.Teachers.GetByIdAsync(DTO.Id);
@@ -226,7 +229,7 @@ Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see the c
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<TeacherDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
     }

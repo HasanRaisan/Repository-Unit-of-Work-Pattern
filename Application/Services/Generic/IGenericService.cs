@@ -1,6 +1,5 @@
 ﻿using Application.Results;
 
-
 namespace Application.Services.Generic
 {
     public interface IGenericService<DTO> where DTO : class

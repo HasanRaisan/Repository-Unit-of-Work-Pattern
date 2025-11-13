@@ -3,11 +3,11 @@ using Infrastructure.UnitOfWork;
 using Infrastructure.Data.Entities;
 using Application.DTOs.Student;
 using AutoMapper;
-using Application.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Application.Validation;
 using FluentValidation;
+using Application.Results;
 
 namespace Application.Services.Students
 {
@@ -33,7 +33,7 @@ namespace Application.Services.Students
             if (!DtoValidationResult.IsValid)
             {
                 var errors = DtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<StudentDTO>(errors);
+                return ResultFactory.Fail<StudentDTO>(ErrorType.ValidationError, errors);
             }
 
             // 2 Map DTO to Domain
@@ -43,7 +43,7 @@ namespace Application.Services.Students
              var DomainValidationResult =  studentDomain.ValidateBusinessRules();
             if (!DomainValidationResult.IsSuccess)
             {
-                return ResultFactory.Fail<StudentDTO>(DomainValidationResult.Errors);
+                return ResultFactory.Fail<StudentDTO>(ErrorType.ValidationError, DomainValidationResult.Errors);
             }
 
             // 4️ Map Domain to Entity and add to DB
@@ -57,7 +57,7 @@ namespace Application.Services.Students
                 int affectedRows = await _unitOfWork.SaveChangesAsync();
                 if (affectedRows == 0)
                 {
-                    return ResultFactory.Fail<StudentDTO>("Add operation failed. No rows affected.");
+                    return ResultFactory.Fail<StudentDTO>( ErrorType.Conflict, "Add operation failed. No rows affected.");
                 }
 
                 // 6️ Map saved entity back to DTO
@@ -68,17 +68,20 @@ namespace Application.Services.Students
             catch (Exception ex)
             {
                 // Log the erorr
-                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<StudentDTO>(ErrorType.InternalError, "An unexpected database error occurred.");
             }
         }
 
         public async Task<Result<bool>> DeleteAsync(int ID)
         {
+            if (ID <= 0)
+                return ResultFactory.Fail<bool>(ErrorType.ValidationError, "Invalid ID value.");
+
             // 1️ Find student by ID
             var studentToDelete = await _unitOfWork.Students.GetByIdAsync(ID);
             if (studentToDelete == null)
             {
-                return ResultFactory.Fail<bool>($"Student with ID {ID} not found.");
+                return ResultFactory.Fail<bool>( ErrorType.NotFound, $"Student with ID {ID} not found.");
             }
 
             try
@@ -94,12 +97,12 @@ namespace Application.Services.Students
                 }
                 else
                 {
-                    return ResultFactory.Fail<bool>($"Deletion failed. No rows affected for ID {ID}.");
+                    return ResultFactory.Fail<bool>(ErrorType.Conflict, $"Deletion failed. No rows affected for ID {ID}.");
                 }
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<bool>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<bool>(ErrorType.InternalError, "An unexpected database error occurred.");
             }
         }
 
@@ -122,21 +125,24 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<IEnumerable<StudentDTO>>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<IEnumerable<StudentDTO>>( ErrorType.InternalError, "An unexpected database error occurred.");
             }
         }
 
 
-        public async Task<Result<StudentDTO>> GetByIDAsync(int id)
+        public async Task<Result<StudentDTO>> GetByIDAsync(int ID)
         {
+            if (ID <= 0)
+                return ResultFactory.Fail<StudentDTO>(ErrorType.ValidationError, "Invalid ID value.");
+
             try
             {
                 // 1️ Find student by ID
-                var studentEntity = await _unitOfWork.Students.GetByIdAsync(id);
+                var studentEntity = await _unitOfWork.Students.GetByIdAsync(ID);
 
                 //  Check if student exists
                 if (studentEntity == null)
-                    return ResultFactory.Fail<StudentDTO>($"Student with ID {id} not found.");
+                    return ResultFactory.Fail<StudentDTO>(ErrorType.NotFound, $"Student with ID {ID} not found." );
                 
 
                 // 3️ Map entity to DTO
@@ -146,7 +152,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<StudentDTO>(ErrorType.InternalError, "An unexpected da tabase error occurred.");
             }
         }
 
@@ -156,13 +162,13 @@ namespace Application.Services.Students
             // 1️ Find existing student by ID
             var existing = await _unitOfWork.Students.GetByIdAsync(DTO.Id);
             if (existing == null)     
-                return ResultFactory.Fail<StudentDTO>(new List<string> { "Student not found." });
+                return ResultFactory.Fail<StudentDTO>(ErrorType.NotFound, "Student not found." );
             
 
             // 2️ DTO validation using FluentValidation
             var validationResult = await _validator.ValidateAsync(DTO);
             if (!validationResult.IsValid)        
-                return ResultFactory.Fail<StudentDTO>(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
+                return ResultFactory.Fail<StudentDTO>(ErrorType.ValidationError, validationResult.Errors.Select(e => e.ErrorMessage).ToList());
             
 
             // 3️ Map DTO to Domain
@@ -171,7 +177,7 @@ namespace Application.Services.Students
             // 4️ Domain validation / Application rules
             var DomainValidationResult = studentDomain.ValidateBusinessRules();
             if (!DomainValidationResult.IsSuccess)            
-                return ResultFactory.Fail<StudentDTO>(DomainValidationResult.Errors);
+                return ResultFactory.Fail<StudentDTO>(ErrorType.ValidationError, DomainValidationResult.Errors);
             
 
             try
@@ -193,7 +199,7 @@ namespace Application.Services.Students
                 int affectedRows = await _unitOfWork.SaveChangesAsync();
                 if (affectedRows == 0)
                 {
-                    return ResultFactory.Fail<StudentDTO>("Update failed. No corresponding student found or no changes detected.");
+                    return ResultFactory.Fail<StudentDTO>(ErrorType.Conflict, "Update failed. No corresponding student found or no changes detected." );
                 }
 
                 // 7️ Get updated entity and map to DTO
@@ -205,7 +211,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<StudentDTO>("InternalDbError: An unexpected database error occurred.");
+                return ResultFactory.Fail<StudentDTO>( ErrorType.InternalError, "An unexpected database error occurred.");
             }
         }
     }

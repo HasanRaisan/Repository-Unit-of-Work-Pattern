@@ -47,14 +47,14 @@ namespace Application.Services.Auth
 
 
 
-        public async Task<Result<AuthResult>> LoginAsync(LoginDTO loginDTO)
+        public async Task<Result<AuthResultDTO>> LoginAsync(LoginDTO loginDTO)
         {
             // 1️ DTO validation using FluentValidation
             var dtoValidationResult = await _loginValidator.ValidateAsync(loginDTO);
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<AuthResult>(errors);
+                return ResultFactory.Fail<AuthResultDTO>( ErrorType.ValidationError, errors);
             }
 
             // 2️ Map to Domain and validate business rules
@@ -62,7 +62,7 @@ namespace Application.Services.Auth
             var domainValidationResult = userDomain.ValidateBusinessRules();
             if (!domainValidationResult.IsSuccess)
             {
-                return ResultFactory.Fail<AuthResult>(domainValidationResult.Errors);
+                return ResultFactory.Fail<AuthResultDTO>( ErrorType.ValidationError, domainValidationResult.Errors);
             }
 
             try
@@ -71,7 +71,7 @@ namespace Application.Services.Auth
                 var user = await _userManager.FindByEmailAsync(userDomain.Email!);
                 if (user == null || !await _userManager.CheckPasswordAsync(user, userDomain.Password!))
                 {
-                    return ResultFactory.Fail<AuthResult>(new List<string> { "Invalid email or password." });
+                    return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, "Invalid email or password.");
                 }
 
                 // 4️ Retrieve user claims and roles
@@ -82,7 +82,7 @@ namespace Application.Services.Auth
                 var authResultToken = _tokenService.CreateToken((ApplicationUserEntity)user, roles.ToList(), userClaims.ToList());
 
                 // 6️ Map to AuthResult DTO
-                var authDTO = new AuthResult
+                var authDTO = new AuthResultDTO
                 {
                     IsAuthenticated = true,
                     UserName = user.UserName ?? string.Empty,
@@ -97,11 +97,11 @@ namespace Application.Services.Auth
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during the login process.");
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.InternalError, "An unexpected error occurred during the login process.");
             }
 
         }
-        public async Task<Result<AuthResult>> RegisterAsync(RegisterDTO registerDTO)
+        public async Task<Result<AuthResultDTO>> RegisterAsync(RegisterDTO registerDTO)
         {
 
 
@@ -110,7 +110,7 @@ namespace Application.Services.Auth
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<AuthResult>(errors);
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, errors);
             }
 
             // 2 Map DTO to Domain
@@ -120,7 +120,7 @@ namespace Application.Services.Auth
             var domainValidationResult = registerDomain.ValidateBusinessRules();
             if (!domainValidationResult.IsSuccess)
             {
-                return ResultFactory.Fail<AuthResult>(domainValidationResult.Errors);
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
             }
 
             // 4️ Map Domain to Identity entity
@@ -133,7 +133,7 @@ namespace Application.Services.Auth
                 if (!createResult.Succeeded)
                 {
                     var errors = createResult.Errors.Select(e => e.Description).ToList();
-                    return ResultFactory.Fail<AuthResult>(errors);
+                    return ResultFactory.Fail<AuthResultDTO>(ErrorType.Conflict, errors);
                 }
 
                 // 6 Generate JWT token (optional: empty roles for now)
@@ -144,7 +144,7 @@ namespace Application.Services.Auth
                 );
 
                 // 7 Map to AuthResult
-                var authResultDTO = new AuthResult
+                var authResultDTO = new AuthResultDTO
                 {
                     IsAuthenticated = true,
                     UserName = userEntity.UserName ?? string.Empty,
@@ -159,19 +159,19 @@ namespace Application.Services.Auth
             }
             catch (Exception ex)
             {
-                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during user registration.");
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.InternalError, "An unexpected error occurred during user registration.");
             }
 
         }
 
 
-        public async Task<Result<AuthResult>> AssignRoleAsync(AssignRoleDTO assignRoleDTO)
+        public async Task<Result<AuthResultDTO>> AssignRoleAsync(AssignRoleDTO assignRoleDTO)
         {
             var dtoValidationResult = await _assignRoleValidator.ValidateAsync(assignRoleDTO);
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return ResultFactory.Fail<AuthResult>(errors);
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, errors);
             }
 
             try
@@ -182,13 +182,13 @@ namespace Application.Services.Auth
 
                 if (user == null || !roleExists)
                 {
-                    return ResultFactory.Fail<AuthResult>(new List<string> { "User ID or Role not found." });
+                    return ResultFactory.Fail<AuthResultDTO>(ErrorType.NotFound, "User ID or Role not found." );
                 }
 
                 // 2️ Check if the user already has this role
                 if (await _userManager.IsInRoleAsync(user, assignRoleDTO.Role!))
                 {
-                    var alreadyAssigned = new AuthResult
+                    var alreadyAssigned = new AuthResultDTO
                     {
                         Message = $"User already has the '{assignRoleDTO.Role}' role.",
                         UserName = user.UserName!
@@ -201,11 +201,11 @@ namespace Application.Services.Auth
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
-                    return ResultFactory.Fail<AuthResult>(errors);
+                    return ResultFactory.Fail<AuthResultDTO>(ErrorType.Conflict, errors);
                 }
 
                 // 4️ Prepare success result
-                var authModel = new AuthResult
+                var authModel = new AuthResultDTO
                 {
                     IsAuthenticated = false, // just role assignment, not login
                     UserName = user.UserName!,
@@ -218,7 +218,7 @@ namespace Application.Services.Auth
             }
             catch(Exception ex)
             {
-                return ResultFactory.Fail<AuthResult>("InternalDbError: An unexpected error occurred during role assignment.");
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.InternalError, "An unexpected error occurred during role assignment.");
             }
         }
     }

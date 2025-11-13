@@ -6,13 +6,13 @@ namespace Application.Services.Auth
     public interface IAuthService
     {
 
-        Task<Result<AuthResult>> LoginAsync(LoginDTO loginDTO);
+        Task<Result<AuthResultDTO>> LoginAsync(LoginDTO loginDTO);
 
 
-        Task<Result<AuthResult>> RegisterAsync(RegisterDTO registerDTO);
+        Task<Result<AuthResultDTO>> RegisterAsync(RegisterDTO registerDTO);
 
 
-        Task<Result<AuthResult>> AssignRoleAsync(AssignRoleDTO roleDTO);
+        Task<Result<AuthResultDTO>> AssignRoleAsync(AssignRoleDTO roleDTO);
     }
 }
  

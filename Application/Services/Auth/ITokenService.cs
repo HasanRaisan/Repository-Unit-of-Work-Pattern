@@ -1,4 +1,4 @@
-﻿using Application.Results;
+﻿using Application.DTOs.Identity;
 using Infrastructure;
 using Infrastructure.Data.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +9,7 @@ namespace Application.Services.Auth
     public interface ITokenService
     {
 
-        AuthResult CreateToken(ApplicationUserEntity user, List<string> roles, IList<Claim> userClaims); 
+        AuthResultDTO CreateToken(ApplicationUserEntity user, List<string> roles, IList<Claim> userClaims); 
         string GenerateRefreshToken();
     }
 }

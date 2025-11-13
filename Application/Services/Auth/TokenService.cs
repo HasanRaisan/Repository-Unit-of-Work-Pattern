@@ -1,5 +1,5 @@
 ﻿using Application.Configruration;
-using Application.Results;
+using Application.DTOs.Identity;
 using Infrastructure.Data.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +25,7 @@ namespace Application.Services.Auth
             _jwtSettings = jwtSettings.Value;
         }
 
-        public AuthResult  CreateToken(ApplicationUserEntity user, List<string> roles, IList<Claim> userClaims)
+        public AuthResultDTO  CreateToken(ApplicationUserEntity user, List<string> roles, IList<Claim> userClaims)
         {
             var claims = new List<Claim>()
             {
@@ -47,7 +47,7 @@ namespace Application.Services.Auth
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            return new AuthResult
+            return new AuthResultDTO
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Expiration = token.ValidTo,
