@@ -32,6 +32,8 @@ namespace Application.Mapping
             CreateMap<RegisterDTO, RegisterDomain>();
             CreateMap<RegisterDomain, ApplicationUserEntity>();
 
+            CreateMap<DepartmentDomain, DepartmentEntity>().ReverseMap();
+
         }
     }
 }

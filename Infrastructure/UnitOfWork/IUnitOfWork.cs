@@ -8,6 +8,7 @@ namespace Infrastructure.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         IRepository<StudentEntity> Students { get; }
+        IRepository<DepartmentEntity> Departments { get; }
         ITeacherRepository Teachers { get; }
         IRepository<ApplicationUserEntity> ApplicationUsers { get; }
         IRepository<ApplicationRoleEntity> ApplicationRoles { get; }

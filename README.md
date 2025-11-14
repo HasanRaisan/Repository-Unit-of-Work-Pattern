@@ -9,109 +9,114 @@ The project supports **Teacher**, **Student**, and **User Management**, includin
 ## 🧱 Project Structure
 
 ```
-TeacherStudentAPI
-|
-|-- API
-|    |-- Properties
-|    |      |-- launchSettings.json
-|    |      |
-|    |-- Controllers
-|    |      |-- StudentController.cs
-|    |      |-- TeacherController.cs
-|    |      |-- UserController.cs
-|    |      |
-|    |-- Midlleware
-|    |      |-- AdvancedProfilingMiddleware.cs
-|    |      |-- ExceptionHandlingMiddleware.cs
-|    |      |-- RateLimitingMiddleware.cs
-|    |      |
-|    |-- packages.cs
-|    |-- appsettings.json
-|    |-- Program
-|    |-- TeacherStudentAPI.http
-|    |
-|-- Application
-|    |-- Configruration
-|    |      | -- JwtSettings.cs
-|    |-- Constants
-|    |      | -- RoleConstants.cs
-|    |- - - - DTOs
-|    |      | -- Identity
-|    |      |       |-- AssignRoleDTO.cs
-|    |      |       |-- AuthResultDTO.cs
-|    |      |       |-- LoginDTO.cs
-|    |      |       |-- RegisterDTO.cs
-|    |      | -- Student
-|    |      |       |-- StudentDTO.cs
-|    |      | -- Teacher
-|    |      |       |-- TeacherDTO.cs
-|    |- - Extensions
-|    |      | -- ServiceCollectionExtensions.cs
-|    |- - Mapping
-|    |      | -- MappingProfile.cs
-|    |- - Result
-|    |      | -- Error.cs
-|    |      | -- ErrorType.cs
-|    |      | -- Result.cs
-|    |      | -- ResultFactory.cs
-|    |      | -- ResultToActionMapper.cs
-|    |- - Services
-|    |      | -- Auth
-|    |      |     | -- IAuthService.cs
-|    |      |     | -- AuthService.cs
-|    |      |     | -- ITokenService.cs
-|    |      |     | -- TokenService.cs
-|    |      | -- Generic
-|    |      |     | -- IGenericService.cs
-|    |      | -- Student
-|    |      |     | -- IStudent.cs
-|    |      |     | -- StudentService.cs
-|    |      | -- Teacher
-|    |      |     | -- ITeacher.cs
-|    |      |     | -- TeacherService.cs
-|    |- - Validation
-|    |      | -- AssignRoleDTOValidator.cs
-|    |      | -- LoginDTOValidator.cs
-|    |      | -- RegisterDTOValidator.cs
-|    |      | -- StudentDTOValidator.cs
-|    |      | -- TeacherDTOValidator.cs
-|    |      |
-|-- Domain
-|    | -- Entites
-|    |      |-- Auth
-|    |      |     |-- AssignRoleDomain.cs
-|    |      |     | -- LoginDomain.cs
-|    |      |     | -- RegisterDomain.cs
-|    |      | -- Core
-|    |      |     | -- StudentDomain.cs
-|    |      |     | -- TeacherDomain.cs
-|    |      |
-|    | -- Results
-|    |      |-- Result
-|    |      |
-|-- Infrastructure
-|    |-- Data
-|    |      |-- Entities
-|    |      |      |-- ApplicationRoleEntity.cs
-|    |      |      |-- ApplicationUserEntity.cs
-|    |      |      |-- StudentEntity.cs
-|    |      |      |-- TeacherEntity.cs
-|    |      |-- AppDbContext.cs
-|    |-- Extensions
-|    |      |-- InfrastructureExtensions.cs
-|    |-- Identity
-|    |      |-- ApplicationDbContextSeed.cs
-|    |-- Migrations
-|    |- - Repositories
-|    |      | -- Generic
-|    |      |     | -- IRepository.cs
-|    |      |     | -- Repository.cs
-|    |      | -- Spesific
-|    |      |     | -- ITeacherRepository.cs
-|    |      |     | -- TeacherRepository.cs
-|    |-- UnitOfWork
-|    |      |-- IUnitOfWork.cs
-|    |      |-- UnitOfWork.cs
+
+API
+ |-- Properties
+ |      |-- launchSettings.json
+ |      |
+ |-- Controllers
+ |      |-- StudentController.cs
+ |      |-- TeacherController.cs
+ |      |-- UserController.cs
+ |      |
+ |-- Midlleware
+ |      |-- AdvancedProfilingMiddleware.cs
+ |      |-- ExceptionHandlingMiddleware.cs
+ |      |-- RateLimitingMiddleware.cs
+ |      |
+ |-- packages.cs
+ |-- appsettings.json
+ |-- Program
+ |-- TeacherStudentAPI.http
+ |
+ |
+ |
+Application
+ |-- Configruration
+ |      | -- JwtSettings.cs
+ |-- Constants
+ |      | -- RoleConstants.cs
+ |- - - - DTOs
+ |      | -- Identity
+ |      |       |-- AssignRoleDTO.cs
+ |      |       |-- AuthResultDTO.cs
+ |      |       |-- LoginDTO.cs
+ |      |       |-- RegisterDTO.cs
+ |      | -- Student
+ |      |       |-- StudentDTO.cs
+ |      | -- Teacher
+ |      |       |-- TeacherDTO.cs
+ |- - Extensions
+ |      | -- ServiceCollectionExtensions.cs
+ |- - Mapping
+ |      | -- MappingProfile.cs
+ |- - Result
+ |      | -- Error.cs
+ |      | -- ErrorType.cs
+ |      | -- Result.cs
+ |      | -- ResultFactory.cs
+ |      | -- ResultToActionMapper.cs
+ |- - Services
+ |      | -- Auth
+ |      |     | -- IAuthService.cs
+ |      |     | -- AuthService.cs
+ |      |     | -- ITokenService.cs
+ |      |     | -- TokenService.cs
+ |      | -- Generic
+ |      |     | -- IGenericService.cs
+ |      | -- Student
+ |      |     | -- IStudent.cs
+ |      |     | -- StudentService.cs
+ |      | -- Teacher
+ |      |     | -- ITeacher.cs
+ |      |     | -- TeacherService.cs
+ |- - Validation
+ |      | -- AssignRoleDTOValidator.cs
+ |      | -- LoginDTOValidator.cs
+ |      | -- RegisterDTOValidator.cs
+ |      | -- StudentDTOValidator.cs
+ |      | -- TeacherDTOValidator.cs
+ |
+ |
+ |
+Domain
+ | -- Entites
+ |      |-- Auth
+ |      |     |-- AssignRoleDomain.cs
+ |      |     | -- LoginDomain.cs
+ |      |     | -- RegisterDomain.cs
+ |      | -- Core
+ |      |     | -- StudentDomain.cs
+ |      |     | -- TeacherDomain.cs
+ |      |
+ | -- Results
+ |      |-- Result
+ |
+ |
+ |
+Infrastructure
+ |-- Data
+ |      |-- Entities
+ |      |      |-- ApplicationRoleEntity.cs
+ |      |      |-- ApplicationUserEntity.cs
+ |      |      |-- StudentEntity.cs
+ |      |      |-- TeacherEntity.cs
+ |      |-- AppDbContext.cs
+ |-- Extensions
+ |      |-- InfrastructureExtensions.cs
+ |-- Identity
+ |      |-- ApplicationDbContextSeed.cs
+ |-- Migrations
+ |- - Repositories
+ |      | -- Generic
+ |      |     | -- IRepository.cs
+ |      |     | -- Repository.cs
+ |      | -- Spesific
+ |      |     | -- ITeacherRepository.cs
+ |      |     | -- TeacherRepository.cs
+ |-- UnitOfWork
+ |      |-- IUnitOfWork.cs
+ |      |-- UnitOfWork.cs
 ```
 
 ---

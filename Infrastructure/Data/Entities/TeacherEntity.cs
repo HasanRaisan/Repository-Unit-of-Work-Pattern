@@ -26,6 +26,9 @@ namespace Infrastructure.Data.Entities
         public decimal Salary { get; set; }
 
         [Required]
+        [ForeignKey("Department")]  // As long as you are using DepartmentId and Department, you can safely delete [Foreign Key(Department)] while preserving the relationship.
         public int DepartmentId { get; set; }
+
+        public DepartmentEntity Department { get; set; } = null!;
     }
 }

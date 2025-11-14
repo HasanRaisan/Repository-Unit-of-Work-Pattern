@@ -3,6 +3,7 @@ using Infrastructure.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Data
 {
@@ -10,6 +11,7 @@ namespace Infrastructure.Data
     {
         public DbSet<StudentEntity> Students { get; set; }
         public DbSet<TeacherEntity> Teachers { get; set; }
+        public DbSet<DepartmentEntity> Departments { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -29,6 +31,16 @@ namespace Infrastructure.Data
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
+            // Department Table
+            builder.Entity<DepartmentEntity>().Property(d => d.Created)
+                .HasDefaultValueSql("GETDATE()");
+
+            foreach (var relationship in builder.Model.GetEntityTypes().
+                SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
 
     }

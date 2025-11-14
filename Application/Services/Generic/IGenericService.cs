@@ -2,12 +2,15 @@
 
 namespace Application.Services.Generic
 {
-    public interface IGenericService<DTO> where DTO : class
+    public interface IGenericService<TReadDTO, TCreateDTO, TUpdateDTO> 
+        where TReadDTO: class
+        where TCreateDTO: class
+        where TUpdateDTO  : class
     {
-        Task<Result<DTO>> GetByIDAsync(int id); 
-        Task<Result<IEnumerable<DTO>>> GetAllAsync();
-        Task<Result<DTO>> AddAsync(DTO DTO);
-        Task<Result<DTO>> UpdateAsync(DTO DTO);
+        Task<Result<TReadDTO>> GetByIDAsync(int id); 
+        Task<Result<IEnumerable<TReadDTO>>> GetAllAsync();
+        Task<Result<TReadDTO>> AddAsync(TCreateDTO DTO);
+        Task<Result<TReadDTO>> UpdateAsync(TUpdateDTO DTO);
         Task<Result<bool>> DeleteAsync(int ID);
     }
 }
