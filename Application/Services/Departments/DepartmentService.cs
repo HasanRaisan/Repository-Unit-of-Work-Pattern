@@ -1,31 +1,37 @@
 ﻿using Application.DTOs.Department;
 using Application.DTOs.Teaher;
 using Application.Results;
+using Application.Services.Logging;
 using AutoMapper;
 using Domain.Entities.Department;
 using FluentValidation;
 using Infrastructure.Data.Entities;
 using Infrastructure.UnitOfWork;
+using System.Reflection;
 
 namespace Application.Services.Departments
 {
-    public class DepartmentService : IDepartment
+    public class DepartmentService : IDepartmentService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<DepartmentCreateDTO> _createValidator;
         private readonly IValidator<DepartmentUpdateDTO> _updateValidator;
+        private readonly IErrorLogService _logger;
 
         public DepartmentService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<DepartmentCreateDTO> createValidator,
-            IValidator<DepartmentUpdateDTO> updateValidator)
+            IValidator<DepartmentUpdateDTO> updateValidator,
+            IErrorLogService logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            this._logger = logger;
         }
         private const string DbErrorMessage = "An unexpected database error occurred.";
+        private const string PathForErrorLog = "TeacherSerivce";
         private Result<IEnumerable<DepartmentDTO>> EmptyList() => ResultFactory.Success(Enumerable.Empty<DepartmentDTO>());
 
 
@@ -71,8 +77,10 @@ namespace Application.Services.Departments
                 var saved = _mapper.Map<DepartmentDTO>(entity);
                 return ResultFactory.Success(saved);
             }
-            catch
+            catch (Exception ex) 
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: MethodBase.GetCurrentMethod()?.Name ?? nameof(AddAsync));  // what r the diffrences (nameof(AddAsync), GetCurrentMethod)??
+
                 return ResultFactory.Fail<DepartmentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -101,8 +109,10 @@ namespace Application.Services.Departments
 
                 return ResultFactory.Fail<bool>(ErrorType.Conflict, "Deletion failed. No rows affected.");
             }
-            catch
+            catch(Exception ex) 
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(DeleteAsync));
+
                 return ResultFactory.Fail<bool>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -125,6 +135,8 @@ namespace Application.Services.Departments
             }
             catch(Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetAllAsync));
+
                 return ResultFactory.Fail<IEnumerable<DepartmentDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -147,8 +159,10 @@ namespace Application.Services.Departments
                 var dto = _mapper.Map<DepartmentDTO>(entity);
                 return ResultFactory.Success(dto);
             }
-            catch
+            catch (Exception ex) 
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetByIDAsync));
+
                 return ResultFactory.Fail<DepartmentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -201,8 +215,10 @@ namespace Application.Services.Departments
 
                 return ResultFactory.Success(updatedDTO);
             }
-            catch
+            catch(Exception ex) 
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(UpdateAsync));
+
                 return ResultFactory.Fail<DepartmentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }

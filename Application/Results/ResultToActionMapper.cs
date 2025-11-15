@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Services.Logging;
 
 namespace Application.Results
 {
@@ -12,6 +15,7 @@ namespace Application.Results
     {
         public static IActionResult ToActionResult<T>(this Result<T> result)
         {
+
             // 1. (Success)
             if (result.IsSuccess)
                 return new OkObjectResult(result.Data);
@@ -37,6 +41,7 @@ namespace Application.Results
                 ErrorType.InternalError =>
                     new ObjectResult(new { Errors = new[] { result.Error.Message } })
                     {
+                        
                         StatusCode = StatusCodes.Status500InternalServerError
                     },
 

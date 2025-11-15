@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Department;
 using Application.DTOs.Student;
 using Application.Results;
+using Application.Services.Logging;
 using Application.Validation.Student;
 using AutoMapper;
 using Domain.Entities.Student;
@@ -10,17 +11,20 @@ using Infrastructure.UnitOfWork;
 
 namespace Application.Services.Students
 {
-    public class StudentService : IStudent
+    public class StudentService : IStudentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IErrorLogService _logger;
         private readonly IMapper _mapper;
         private readonly IValidator<StudentCreateDTO> _studentCreateValidator;
         private readonly IValidator<StudentUpdateDTO> _studentUpdateValidator;
 
         public StudentService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<StudentCreateDTO> studentCreateValidator,
-            IValidator<StudentUpdateDTO> studentUpdateValidator)
+            IValidator<StudentUpdateDTO> studentUpdateValidator,
+            IErrorLogService logger)
         {
+            this._logger = logger;
             this._unitOfWork = unitOfWork;
             this._mapper = mapper;
             this._studentCreateValidator = studentCreateValidator;
@@ -28,6 +32,7 @@ namespace Application.Services.Students
         }
         private const string DbErrorMessage = "An unexpected database error occurred.";
         private Result<IEnumerable<StudentDTO>> EmptyList() => ResultFactory.Success(Enumerable.Empty<StudentDTO>());
+        private const string PathForErrorLog = "StudentSerivce";
 
         public async Task<Result<StudentDTO>> AddAsync(StudentCreateDTO DTO)
         {
@@ -69,7 +74,9 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
-                // Log the erorr
+
+               await _logger.LogAsync(Ex:ex, Path: PathForErrorLog, Method: nameof(AddAsync));
+
                 return ResultFactory.Fail<StudentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -96,11 +103,13 @@ namespace Application.Services.Students
                 if (affectedRows > 0)
                     return ResultFactory.Success(true);
 
-                    return ResultFactory.Fail<bool>(ErrorType.Conflict, $"Deletion failed. No rows affected for ID {ID}.");
-                
+                return ResultFactory.Fail<bool>(ErrorType.Conflict, $"Deletion failed. No rows affected for ID {ID}.");
+
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(DeleteAsync));
+
                 return ResultFactory.Fail<bool>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -124,6 +133,7 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetAllAsync));
                 return ResultFactory.Fail<IEnumerable<StudentDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -149,6 +159,8 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetByIDAsync));
+
                 return ResultFactory.Fail<StudentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -209,6 +221,8 @@ namespace Application.Services.Students
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(UpdateAsync));
+
                 return ResultFactory.Fail<StudentDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }

@@ -11,9 +11,9 @@ namespace TeacherStudentAPI.Controllers
     [ApiController]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartment _departmentService;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartment departmentService)
+        public DepartmentController(IDepartmentService departmentService)
         {
             _departmentService = departmentService;
         }

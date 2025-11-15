@@ -90,14 +90,17 @@ Application
  |      |     |-- TokenService.cs
  |      |-- Department
  |      |     |-- DepartmentService.cs
- |      |     |-- IDepartment.cs
+ |      |     |-- IDepartmentService.cs
  |      |-- Generic
  |      |     |-- IGenericService.cs
+ |      |-- Logging
+ |      |     |-- ErrorLogService.cs
+ |      |     |-- IErrorLogService.cs
  |      |-- Student
- |      |     |-- IStudent.cs
+ |      |     |-- IStudentService.cs
  |      |     |-- StudentService.cs
  |      |-- Teacher
- |      |     |-- ITeacher.cs
+ |      |     |-- ITeacherService.cs
  |      |     |-- TeacherService.cs
  |
  |-- Validation
@@ -164,6 +167,7 @@ Infrastructure
  |      |      |-- ApplicationRoleEntity.cs
  |      |      |-- ApplicationUserEntity.cs
  |      |      |-- DepartmentEntity.cs
+ |      |      |-- ErrorLogEntity.cs
  |      |      |-- StudentEntity.cs
  |      |      |-- TeacherEntity.cs
  |      |
@@ -181,7 +185,10 @@ Infrastructure
  |      |-- Generic
  |      |     |-- IRepository.cs
  |      |     |-- Repository.cs
- |      |-- Spesific
+ |      |-- ErrorLog
+ |      |     |-- IErrorLogRepository.cs
+ |      |     |-- ErrorLogRepository.cs
+ |      |-- Teacher
  |      |     |-- ITeacherRepository.cs
  |      |     |-- TeacherRepository.cs
  |

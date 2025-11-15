@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Application.Services.Logging;
+using System.Net;
+using System.Reflection;
 using System.Text.Json;
 
 namespace TeacherStudentAPI.Midlleware
@@ -20,11 +22,13 @@ namespace TeacherStudentAPI.Midlleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IServiceProvider serviceProvider)
         {
             _next = next;
             _logger = logger;
+            this._serviceProvider = serviceProvider;
         }
 
         public async Task Invoke(HttpContext context)
@@ -35,6 +39,7 @@ namespace TeacherStudentAPI.Midlleware
             }
             catch (Exception ex)
             {
+
                 // Generate trace ID for tracking
                 var traceId = context.TraceIdentifier;
 
@@ -45,7 +50,6 @@ namespace TeacherStudentAPI.Midlleware
                     context.Request.Path,
                     traceId
                 );
-
                 // Prepare safe response
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
@@ -58,9 +62,36 @@ namespace TeacherStudentAPI.Midlleware
                 };
 
                 var json = JsonSerializer.Serialize(errorResponse);
+
+                async Task LogErrorToDatabase()
+                {
+                    // Middleware is singleton, cannot inject scoped service directly
+                    // Use CreateScope() to resolve IErrorLogService per request
+
+                    using var scope = _serviceProvider.CreateScope();
+                    var errorLogService = scope.ServiceProvider.GetRequiredService<IErrorLogService>();
+                    try
+                    {
+                        await errorLogService.LogAsync(
+                            Ex: ex,
+                            Path: context.Request.Path,
+                            Method: MethodBase.GetCurrentMethod()?.Name ?? ""
+                        );
+                    }
+                    catch ( Exception ex ) 
+                    {
+                        Console.WriteLine($"Failed to log error to DB: {ex.Message}");
+                    }
+                }
+                await LogErrorToDatabase();
+
+
                 await context.Response.WriteAsync(json);
             }
+
+
         }
+
     }
 }
 

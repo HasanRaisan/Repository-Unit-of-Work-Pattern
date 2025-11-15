@@ -1,6 +1,8 @@
 ﻿using Infrastructure.Data.Entities;
+using Infrastructure.Repositories;
+using Infrastructure.Repositories.ErrorLog;
 using Infrastructure.Repositories.Generic;
-using Infrastructure.Repositories.Spesific;
+using Infrastructure.Repositories.Teacher;
 
 
 namespace Infrastructure.UnitOfWork
@@ -12,7 +14,7 @@ namespace Infrastructure.UnitOfWork
         ITeacherRepository Teachers { get; }
         IRepository<ApplicationUserEntity> ApplicationUsers { get; }
         IRepository<ApplicationRoleEntity> ApplicationRoles { get; }
-
+        IErrorLogRepository ErrorLoggers { get; }
         Task<int> SaveChangesAsync();
     }
 }

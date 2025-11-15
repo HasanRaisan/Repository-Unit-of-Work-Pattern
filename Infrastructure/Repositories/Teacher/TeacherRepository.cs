@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Repositories.Spesific
+namespace Infrastructure.Repositories.Teacher
 {
 
     public class TeacherRepository : Repository<TeacherEntity>, ITeacherRepository

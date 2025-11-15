@@ -12,6 +12,7 @@ namespace Infrastructure.Data
         public DbSet<StudentEntity> Students { get; set; }
         public DbSet<TeacherEntity> Teachers { get; set; }
         public DbSet<DepartmentEntity> Departments { get; set; }
+        public DbSet<ErrorLogEntity> ErrorLogs { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

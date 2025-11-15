@@ -9,7 +9,7 @@ using Application.Results;
 
 namespace Application.Services.Teachers
 {
-    public interface ITeacher : IGenericService<TeacherDTO, TeacherCreateDTO, TeacherUpdateDTO>
+    public interface ITeacherService : IGenericService<TeacherDTO, TeacherCreateDTO, TeacherUpdateDTO>
     {
         Task<Result<IEnumerable<TeacherDTO>>> GetTeachersByDepartmentAsync(int Id);
 

@@ -5,27 +5,31 @@ using Infrastructure.UnitOfWork;
 using FluentValidation;
 using Application.Results;
 using Domain.Entities.Teacher;
+using Application.Services.Logging;
+using System.Reflection;
 
 namespace Application.Services.Teachers
 {
-    public class TeacherService : ITeacher
+    public class TeacherService : ITeacherService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<TeacherCreateDTO> _teacherCreateDTOValidator;
         private readonly IValidator<TeacherUpdateDTO> _teacherUpdateDTOValidator;
-
+        private readonly IErrorLogService _logger;
         private const string DbErrorMessage = "An unexpected database error occurred.";
+        private const string PathForErrorLog = "TeacherSerivce";
         private Result<IEnumerable<TeacherDTO>> EmptyList() => ResultFactory.Success(Enumerable.Empty<TeacherDTO>());
         public TeacherService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<TeacherCreateDTO> TeacherCreateDTOValidator,
-            IValidator<TeacherUpdateDTO> teacherUpdateDTOValidator)
+            IValidator<TeacherUpdateDTO> teacherUpdateDTOValidator,
+            IErrorLogService logger)
         {
             this._unitOfWork = unitOfWork;
             this._mapper = mapper;
             this._teacherCreateDTOValidator = TeacherCreateDTOValidator;
             this._teacherUpdateDTOValidator = teacherUpdateDTOValidator;
-
+            this._logger = logger;
         }
 
         public async Task<Result<TeacherDTO>> AddAsync(TeacherCreateDTO DTO)
@@ -62,6 +66,8 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: MethodBase.GetCurrentMethod()?.Name?? nameof(AddAsync));
+
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
 
@@ -100,6 +106,8 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(DeleteAsync));
+
                 return ResultFactory.Fail<bool>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -124,6 +132,8 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetAllAsync));
+
                 return ResultFactory.Fail<IEnumerable<TeacherDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -149,6 +159,8 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(GetByIDAsync));
+
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -173,6 +185,8 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: "GetTeachersByDepartmentAsync");
+
                 return ResultFactory.Fail<IEnumerable<TeacherDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
@@ -232,6 +246,8 @@ Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see the c
             }
             catch (Exception ex)
             {
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: nameof(UpdateAsync));
+
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }
         }

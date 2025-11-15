@@ -1,7 +1,8 @@
 ﻿using Infrastructure.Data;
 using Infrastructure.Data.Entities;
+using Infrastructure.Repositories.ErrorLog;
 using Infrastructure.Repositories.Generic;
-using Infrastructure.Repositories.Spesific;
+using Infrastructure.Repositories.Teacher;
 using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace Infrastructure.Extensions
         {
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<ITeacherRepository, TeacherRepository>();
+            services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
 
             services.AddScoped<IUnitOfWork, Infrastructure.UnitOfWork.UnitOfWork>();
 
