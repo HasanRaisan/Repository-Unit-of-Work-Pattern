@@ -1,119 +1,190 @@
-# 🎓 TeacherStudentAPI
+# Clean Architecture Web API (.NET 9)
 
-A **scalable** and **maintainable** **ASP.NET Core Web API** designed using **Clean Architecture** principles, ensuring clear **separation of responsibilities** across all layers.
+A professional, scalable, and modular **Clean Architecture** implementation using **.NET 9 Web API**. This project follows industry best practices and clean separation of concerns across four main layers:
 
-The project supports **Teacher**, **Student**, and **User Management**, including **Authentication** and **Role-Based Authorization**, and follows best practices for **Separation of Concerns** and **Dependency Injection**.
+- **API Layer** – Entry point, controllers, middleware, configurations.
+- **Application Layer** – Business logic, DTOs, validators, services, mappings.
+- **Domain Layer** – Core domain entities, rules, and business constraints.
+- **Infrastructure Layer** – EF Core, repositories, database context, migrations, persistence.
+
+This structure promotes **testability**, **maintainability**, **scalability**, and clean separation of responsibilities.
 
 ---
 
-## 🧱 Project Structure
+# 📁 Folder Structure
+
+## **API Layer**
 
 ```
-
 API
  |-- Properties
  |      |-- launchSettings.json
- |      |
+ |
  |-- Controllers
+ |      |-- DepartmentController.cs
  |      |-- StudentController.cs
  |      |-- TeacherController.cs
  |      |-- UserController.cs
- |      |
+ |
  |-- Midlleware
  |      |-- AdvancedProfilingMiddleware.cs
  |      |-- ExceptionHandlingMiddleware.cs
  |      |-- RateLimitingMiddleware.cs
- |      |
+ |
  |-- packages.cs
  |-- appsettings.json
- |-- Program
+ |-- Program.cs
  |-- TeacherStudentAPI.http
- |
- |
- |
+```
+
+---
+
+## **Application Layer**
+
+```
 Application
  |-- Configruration
  |      | -- JwtSettings.cs
  |-- Constants
  |      | -- RoleConstants.cs
- |- - - - DTOs
+ |-- DTOs
+ |      | -- Department
+ |      |       |-- DepartmentBaseDTO.cs
+ |      |       |-- DepartmentCreateDTO.cs
+ |      |       |-- DepartmentDTO.cs
+ |      |       |-- DepartmentUpdateDTO.cs
  |      | -- Identity
  |      |       |-- AssignRoleDTO.cs
  |      |       |-- AuthResultDTO.cs
  |      |       |-- LoginDTO.cs
  |      |       |-- RegisterDTO.cs
  |      | -- Student
+ |      |       |-- StudentBaseDTO.cs
+ |      |       |-- StudentCreateDTO.cs
  |      |       |-- StudentDTO.cs
+ |      |       |-- StudentUpdateDTO.cs
  |      | -- Teacher
+ |      |       |-- TeacherBaseDTO.cs
+ |      |       |-- TeacherCreateDTO.cs
  |      |       |-- TeacherDTO.cs
- |- - Extensions
- |      | -- ServiceCollectionExtensions.cs
- |- - Mapping
- |      | -- MappingProfile.cs
- |- - Result
- |      | -- Error.cs
- |      | -- ErrorType.cs
- |      | -- Result.cs
- |      | -- ResultFactory.cs
- |      | -- ResultToActionMapper.cs
- |- - Services
- |      | -- Auth
- |      |     | -- IAuthService.cs
- |      |     | -- AuthService.cs
- |      |     | -- ITokenService.cs
- |      |     | -- TokenService.cs
- |      | -- Generic
- |      |     | -- IGenericService.cs
- |      | -- Student
- |      |     | -- IStudent.cs
- |      |     | -- StudentService.cs
- |      | -- Teacher
- |      |     | -- ITeacher.cs
- |      |     | -- TeacherService.cs
- |- - Validation
- |      | -- AssignRoleDTOValidator.cs
- |      | -- LoginDTOValidator.cs
- |      | -- RegisterDTOValidator.cs
- |      | -- StudentDTOValidator.cs
- |      | -- TeacherDTOValidator.cs
+ |      |       |-- TeacherUpdateDTO.cs
  |
+ |-- Extensions
+ |      |-- ServiceCollectionExtensions.cs
  |
+ |-- Mapping
+ |      |-- MappingProfile.cs
  |
-Domain
- | -- Entites
+ |-- Result
+ |      |-- Error.cs
+ |      |-- ErrorType.cs
+ |      |-- Result.cs
+ |      |-- ResultFactory.cs
+ |      |-- ResultToActionMapper.cs
+ |
+ |-- Services
  |      |-- Auth
- |      |     |-- AssignRoleDomain.cs
- |      |     | -- LoginDomain.cs
- |      |     | -- RegisterDomain.cs
- |      | -- Core
- |      |     | -- StudentDomain.cs
- |      |     | -- TeacherDomain.cs
+ |      |     |-- IAuthService.cs
+ |      |     |-- AuthService.cs
+ |      |     |-- ITokenService.cs
+ |      |     |-- TokenService.cs
+ |      |-- Department
+ |      |     |-- DepartmentService.cs
+ |      |     |-- IDepartment.cs
+ |      |-- Generic
+ |      |     |-- IGenericService.cs
+ |      |-- Student
+ |      |     |-- IStudent.cs
+ |      |     |-- StudentService.cs
+ |      |-- Teacher
+ |      |     |-- ITeacher.cs
+ |      |     |-- TeacherService.cs
+ |
+ |-- Validation
+ |      |-- Department
+ |      |     |-- DepartmentBaseValidator.cs
+ |      |     |-- DepartmentCreateDTOValidator.cs
+ |      |     |-- DepartmentUpdateDTOValidator.cs
+ |      |-- Identity
+ |      |     |-- AssignRoleDTOValidator.cs
+ |      |     |-- LoginDTOValidator.cs
+ |      |     |-- RegisterDTOValidator.cs
+ |      |-- Student
+ |      |     |-- StudentBaseValidator.cs
+ |      |     |-- StudentCreateDTOValidator.cs
+ |      |     |-- StudentUpdateDTOValidator.cs
+ |      |-- Teacher
+ |      |     |-- TeacherBaseValidator.cs
+ |      |     |-- TeacherCreateDTOValidator.cs
+ |      |     |-- TeacherUpdateDTOValidator.cs
+```
+
+---
+
+## **Domain Layer**
+
+```
+Domain
+ |-- Entites
+ |      |-- Auth
+ |      |     |-- AssignRole
+ |      |     |     |-- AssignRoleDomain.cs
+ |      |     |     |-- AssignRoleRules.cs
+ |      |     |-- Login
+ |      |     |     |-- LoginDomain.cs
+ |      |     |     |-- LoginRules.cs
+ |      |     |-- Register
+ |      |     |     |-- RegisterDomain.cs
+ |      |     |     |-- RegisterRules.cs
  |      |
- | -- Results
+ |      |-- Department
+ |      |     |-- DepartmentDomain.cs
+ |      |     |-- DepartmentRules.cs
+ |
+ |      |-- Studnet
+ |      |     |-- StudnetDomain.cs
+ |      |     |-- StudnetRules.cs
+ |
+ |      |-- Teacher
+ |      |     |-- TeacherDomain.cs
+ |      |     |-- TeacherRules.cs
+ |
+ |-- Results
  |      |-- Result
- |
- |
- |
+```
+
+---
+
+## **Infrastructure Layer**
+
+```
 Infrastructure
  |-- Data
  |      |-- Entities
  |      |      |-- ApplicationRoleEntity.cs
  |      |      |-- ApplicationUserEntity.cs
+ |      |      |-- DepartmentEntity.cs
  |      |      |-- StudentEntity.cs
  |      |      |-- TeacherEntity.cs
+ |      |
  |      |-- AppDbContext.cs
+ |
  |-- Extensions
  |      |-- InfrastructureExtensions.cs
+ |
  |-- Identity
  |      |-- ApplicationDbContextSeed.cs
+ |
  |-- Migrations
- |- - Repositories
- |      | -- Generic
- |      |     | -- IRepository.cs
- |      |     | -- Repository.cs
- |      | -- Spesific
- |      |     | -- ITeacherRepository.cs
- |      |     | -- TeacherRepository.cs
+ |
+ |-- Repositories
+ |      |-- Generic
+ |      |     |-- IRepository.cs
+ |      |     |-- Repository.cs
+ |      |-- Spesific
+ |      |     |-- ITeacherRepository.cs
+ |      |     |-- TeacherRepository.cs
+ |
  |-- UnitOfWork
  |      |-- IUnitOfWork.cs
  |      |-- UnitOfWork.cs
@@ -121,7 +192,7 @@ Infrastructure
 
 ---
 
-## 🚀 Features
+# 🚀 Features
 
 - ✅ Clean architecture (**API**, **Application**, **Domain**, **Infrastructure**).
 - ✅ Authentication & Authorization using **ASP.NET Identity**.
@@ -129,7 +200,7 @@ Infrastructure
 - ✅ JWT Token Authentication.
 - ✅ Result Design Pattern (Result<T>) for predictable business outcome handling.
 - ✅ Automated HTTP Status Code Mapping using custom Result.ToActionResult() extension.
-- ✅ AutoMapper for mapping Entities ↔ DTOs ↔ Domains.
+- ✅ AutoMapper for mapping Entities ↔ DTOs
 - ✅ FluentValidation for input validation.
 - ✅ Centralized Exception Handling Middleware.
 - ✅ Rate Limiting & Request Profiling Middleware.
@@ -137,7 +208,7 @@ Infrastructure
 
 ---
 
-## ⚙️ Technologies Used
+# 🛠️ Technologies
 
 - **.NET 9 (ASP.NET Core Web API)**
 - **Entity Framework Core**
@@ -149,7 +220,7 @@ Infrastructure
 
 ---
 
-## 🧩 How to Run
+# 🧩 How to Run
 
 1. **Clone the repository**
 
@@ -178,7 +249,7 @@ Infrastructure
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
 **Hasan Raisan**  
 📧 hasan.raisann@gmail.com  
