@@ -35,7 +35,7 @@ namespace Application.Results
         /// <summary>
         /// Creates a failed result with the given error type and message.
         /// </summary>
-        public static Result<T> Fail(ErrorType type, List<string> message) =>
+        public static Result<T> Fail(ErrorType type, IReadOnlyList<string> message) =>
         new Result<T>(false, default, new Error(type, message));
 
         //public IActionResult ToActionResult()

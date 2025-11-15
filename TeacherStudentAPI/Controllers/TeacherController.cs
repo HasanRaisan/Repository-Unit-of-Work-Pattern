@@ -25,7 +25,7 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Add([FromBody] TeacherDTO teacherDTO)
+        public async Task<IActionResult> Add([FromBody] TeacherCreateDTO teacherDTO)
         {
             var result = await _teacherService.AddAsync(teacherDTO);
 
@@ -67,7 +67,7 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> UpdateTeacher([FromBody] TeacherDTO dto)
+        public async Task<IActionResult> UpdateTeacher([FromBody] TeacherUpdateDTO dto)
         {
             var result = await _teacherService.UpdateAsync(dto);
 

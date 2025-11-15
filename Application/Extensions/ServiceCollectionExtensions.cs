@@ -3,7 +3,6 @@ using Application.Mapping;
 using Application.Services.Auth;
 using Application.Services.Students;
 using Application.Services.Teachers;
-using Application.Validation;
 using Infrastructure.Data;
 using Infrastructure.Data.Entities;
 using Infrastructure.Repositories.Generic;
@@ -12,6 +11,8 @@ using Infrastructure.UnitOfWork;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Validation.Teacher;
+using Application.Services.Departments;
 
 
 namespace Application.Extensions
@@ -25,14 +26,14 @@ namespace Application.Extensions
 
             services.AddScoped<IStudent, StudentService>();
             services.AddScoped<ITeacher, TeacherService>();
-
+            services.AddScoped<IDepartment, DepartmentService>();
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<MappingProfile>();
             }, typeof(ServiceCollectionExtensions).Assembly);
 
 
-            services.AddValidatorsFromAssemblyContaining<StudentDTOValidator>();
+            services.AddValidatorsFromAssemblyContaining<TeacherCreateDTOValidator>();
 
 
             return services;

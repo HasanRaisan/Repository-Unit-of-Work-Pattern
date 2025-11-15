@@ -11,12 +11,11 @@ namespace TeacherStudentAPI.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
+        private readonly IStudent _studentService;
         public StudentController(IStudent studentService)
         {
-            StudentService = studentService;
+            _studentService = studentService;
         }
-
-        public IStudent StudentService { get; }
 
         [HttpPost("add", Name = "AddStudent")]
         [Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Teacher}")]
@@ -24,9 +23,9 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Add([FromBody] StudentDTO studentDTO)
+        public async Task<IActionResult> Add([FromBody] StudentCreateDTO studentDTO)
         {
-            var result = await StudentService.AddAsync(studentDTO);
+            var result = await _studentService.AddAsync(studentDTO);
 
             // RESTful Success: Use 201 Created with Location Header for resource creation.
             if (result.IsSuccess)
@@ -43,7 +42,7 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllStudents()
         {
-            var result = await StudentService.GetAllAsync();
+            var result = await _studentService.GetAllAsync();
 
             return result.ToActionResult();
         }
@@ -56,7 +55,7 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetStudentById(int id)
         {
-            var result = await StudentService.GetByIDAsync(id);
+            var result = await _studentService.GetByIDAsync(id);
             return result.ToActionResult();
         }
 
@@ -68,9 +67,9 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateStudent([FromBody] StudentDTO dto)
+        public async Task<IActionResult> UpdateStudent([FromBody] StudentUpdateDTO dto)
         {
-            var result = await StudentService.UpdateAsync(dto);
+            var result = await _studentService.UpdateAsync(dto);
             return result.ToActionResult();
         }
 
@@ -83,7 +82,7 @@ namespace TeacherStudentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            var result = await StudentService.DeleteAsync(id);
+            var result = await _studentService.DeleteAsync(id);
 
             // Check for success first.
             if (result.IsSuccess)

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Department
 {
-    public class UpdateDepartmentDTO
+    public class DepartmentCreateDTO  : DepartmentBaseDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+
     }
 }

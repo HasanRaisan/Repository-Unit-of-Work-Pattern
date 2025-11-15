@@ -1,12 +1,13 @@
 ﻿using Application.Configruration;
 using Application.Extensions;
-using TeacherStudentAPI.Midlleware;
 using Infrastructure.Extensions;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using TeacherStudentAPI.Midlleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,7 @@ builder.Services.AddSingleton(sp =>
 
 
 
-//        options.DisableDataAnnotationsValidation = true;
+//options.DisableDataAnnotationsValidation = true;
 
 builder.Services.AddIdentityConfiguration(builder.Configuration); /// Data Access
 builder.Services.AddApplicationServices(); // Business
@@ -70,6 +71,38 @@ builder.Services.AddAuthentication(options =>
 
 
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer", 
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+
+
 
 
 
@@ -91,6 +124,8 @@ using (var scope = app.Services.CreateScope())
     var service = scope.ServiceProvider;
     await ApplicationDbContextSeed.SeedRolesAndAdminAsync(service);
 }
+
+
 
 
 

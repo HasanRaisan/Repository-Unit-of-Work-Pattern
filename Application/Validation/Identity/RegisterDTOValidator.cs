@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.Identity;
 using FluentValidation;
 
-namespace Application.Validation
+namespace Application.Validation.Identity
 {
     public class RegisterDTOValidator : AbstractValidator<RegisterDTO>
     {
@@ -14,7 +14,7 @@ namespace Application.Validation
 
             RuleFor(user => user.UserName)
                 .NotEmpty().WithMessage("Student Name is required.")
-                .MinimumLength(2).WithMessage("Student Name must be at least 4 characters long.")
+                .MinimumLength(2).WithMessage("Student Name must be at least 2 characters long.")
                 .MaximumLength(50).WithMessage("Student Name cannot exceed 50 characters.");
             // NOTE: You would add an Async rule here to check for uniqueness in the database.
             

@@ -29,6 +29,6 @@ namespace Infrastructure.Data.Entities
         [ForeignKey("Department")]  // As long as you are using DepartmentId and Department, you can safely delete [Foreign Key(Department)] while preserving the relationship.
         public int DepartmentId { get; set; }
 
-        public DepartmentEntity Department { get; set; } = null!;
+        public virtual DepartmentEntity Department { get; set; } = null!;
     }
 }

@@ -5,11 +5,12 @@ using Application.DTOs.Student;
 using Application.DTOs.Teaher;
 using Application.Results;
 using Infrastructure.Data.Entities;
-using Domain.Entities.Auth;
-using Domain.Entities.Core;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Domain.Entities.Auth.Login;
+using Domain.Entities.Auth.Register;
+using Domain.Entities.Auth.AssignRole;
 
 namespace Application.Services.Auth
 {
@@ -58,12 +59,11 @@ namespace Application.Services.Auth
             }
 
             // 2️ Map to Domain and validate business rules
-            var userDomain = _mapper.Map<LoginDomain>(loginDTO);
-            var domainValidationResult = userDomain.ValidateBusinessRules();
-            if (!domainValidationResult.IsSuccess)
-            {
+            var domainValidationResult = LoginDomain.Create(loginDTO.Email,loginDTO.Password);
+            if (!domainValidationResult.IsSuccess)            
                 return ResultFactory.Fail<AuthResultDTO>( ErrorType.ValidationError, domainValidationResult.Errors);
-            }
+            
+            var userDomain = domainValidationResult.Data;
 
             try
             {
@@ -101,27 +101,25 @@ namespace Application.Services.Auth
             }
 
         }
-        public async Task<Result<AuthResultDTO>> RegisterAsync(RegisterDTO registerDTO)
+        public async Task<Result<AuthResultDTO>> RegisterAsync(RegisterDTO DTO)
         {
 
 
             // 1 DTO validation using FluentValidation
-            var dtoValidationResult = await _registerValidator.ValidateAsync(registerDTO);
+            var dtoValidationResult = await _registerValidator.ValidateAsync(DTO);
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, errors);
             }
 
-            // 2 Map DTO to Domain
-            var registerDomain = _mapper.Map<RegisterDomain>(registerDTO);
 
-            // 3️ Domain validation / Application rules
-            var domainValidationResult = registerDomain.ValidateBusinessRules();
-            if (!domainValidationResult.IsSuccess)
-            {
+            // 3️ Map, Domain validation / Application rules
+            var domainValidationResult = RegisterDomain.Create(DTO.FullName, DTO.UserName, DTO.Email, DTO.Password, DTO.ConfirmPassword);
+            if (!domainValidationResult.IsSuccess)            
                 return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
-            }
+
+            var registerDomain = domainValidationResult.Data;
 
             // 4️ Map Domain to Identity entity
             var userEntity = _mapper.Map<ApplicationUserEntity>(registerDomain);
@@ -165,20 +163,23 @@ namespace Application.Services.Auth
         }
 
 
-        public async Task<Result<AuthResultDTO>> AssignRoleAsync(AssignRoleDTO assignRoleDTO)
+        public async Task<Result<AuthResultDTO>> AssignRoleAsync(AssignRoleDTO DTO)
         {
-            var dtoValidationResult = await _assignRoleValidator.ValidateAsync(assignRoleDTO);
+            var dtoValidationResult = await _assignRoleValidator.ValidateAsync(DTO);
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, errors);
             }
+            var checkDomain = AssignRoleDomain.Create(DTO.UserId, DTO.Role, new List<string> { "Admin", "Teacher", "Student" });
+            if(!checkDomain.IsSuccess)
+                return ResultFactory.Fail<AuthResultDTO>(ErrorType.ValidationError, checkDomain.Errors);
 
             try
             {
                 // 1️ Search for the user by ID and check if the role exists
-                var user = await _userManager.FindByIdAsync(assignRoleDTO.UserId!);
-                var roleExists = await _roleManager.RoleExistsAsync(assignRoleDTO.Role!);
+                var user = await _userManager.FindByIdAsync(DTO.UserId!);
+                var roleExists = await _roleManager.RoleExistsAsync(DTO.Role!);
 
                 if (user == null || !roleExists)
                 {
@@ -186,18 +187,18 @@ namespace Application.Services.Auth
                 }
 
                 // 2️ Check if the user already has this role
-                if (await _userManager.IsInRoleAsync(user, assignRoleDTO.Role!))
+                if (await _userManager.IsInRoleAsync(user, DTO.Role!))
                 {
                     var alreadyAssigned = new AuthResultDTO
                     {
-                        Message = $"User already has the '{assignRoleDTO.Role}' role.",
+                        Message = $"User already has the '{DTO.Role}' role.",
                         UserName = user.UserName!
                     };
                     return ResultFactory.Success(alreadyAssigned);
                 }
 
                 // 3️ Add the role to the user
-                var result = await _userManager.AddToRoleAsync(user, assignRoleDTO.Role!);
+                var result = await _userManager.AddToRoleAsync(user, DTO.Role!);
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
@@ -210,8 +211,8 @@ namespace Application.Services.Auth
                     IsAuthenticated = false, // just role assignment, not login
                     UserName = user.UserName!,
                     Email = user.Email!,
-                    Role = new List<string> { assignRoleDTO.Role! },
-                    Message = $"Role '{assignRoleDTO.Role}' assigned successfully to {user.UserName}."
+                    Role = new List<string> { DTO.Role! },
+                    Message = $"Role '{DTO.Role}' assigned successfully to {user.UserName}."
                 };
 
                 return ResultFactory.Success(authModel);

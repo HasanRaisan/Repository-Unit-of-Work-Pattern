@@ -3,7 +3,7 @@ using Application.Services.Generic;
 
 namespace Application.Services.Departments
 {
-    public interface IDepartment : IGenericService<DepartmentDTO,CreateDepartmentDTO,UpdateDepartmentDTO>
+    public interface IDepartment : IGenericService<DepartmentDTO,DepartmentCreateDTO ,DepartmentUpdateDTO>
     {
 
     }

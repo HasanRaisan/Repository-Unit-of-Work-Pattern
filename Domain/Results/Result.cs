@@ -3,24 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Domain.Results
 {
-    public class Result
+
+    public class Result<T>
     {
         public bool IsSuccess { get; }
-        public List<string> Errors { get; } = new();
+        public bool IsFailure => !IsSuccess;
+        public T Data { get; }
+        public IReadOnlyList<string> Errors { get; }
 
-        private Result(bool isSuccess, List<string>? errors = null)
+        private Result(bool isSuccess, T data, IReadOnlyList<string> errors)
         {
             IsSuccess = isSuccess;
-            if (errors != null)
-                Errors = errors;
+            Data = data;
+            Errors = errors ?? new List<string>();
         }
 
-        public static Result Success() => new(true);
-        public static Result Failure(List<string> errors) => new(false, errors);
-        public static Result Failure(string error) => new(false, new List<string> { error });
+        public static Result<T> Success(T data) =>
+            new Result<T>(true, data, new List<string>());
 
+        public static Result<T> Fail(string error) =>
+            new Result<T>(false, default, new List<string> { error });
+
+        public static Result<T> Fail(IReadOnlyList<string> errors) =>
+            new Result<T>(false, default, errors);
     }
 }

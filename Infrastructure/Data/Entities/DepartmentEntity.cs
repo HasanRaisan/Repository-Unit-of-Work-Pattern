@@ -21,6 +21,6 @@ namespace Infrastructure.Data.Entities
         public string Description { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
 
-        public ICollection<TeacherEntity> Teachers { get; set; }
+         public virtual ICollection<TeacherEntity> Teachers { get; set; }
     }
 }

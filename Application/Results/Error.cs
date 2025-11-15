@@ -6,9 +6,9 @@
     public class Error
     {
         public ErrorType Type { get; }
-        public List<string> Message { get; }
+        public IReadOnlyList<string> Message { get; }
 
-        public Error(ErrorType type, List<string> message)
+        public Error(ErrorType type, IReadOnlyList<string> message)
         {
             Type = type;
             Message = message;

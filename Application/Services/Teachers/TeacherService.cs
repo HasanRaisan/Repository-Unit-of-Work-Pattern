@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Domain.Entities.Core;
 using Application.DTOs.Teaher;
 using Infrastructure.Data.Entities;
 using Infrastructure.UnitOfWork;
 using FluentValidation;
 using Application.Results;
+using Domain.Entities.Teacher;
 
 namespace Application.Services.Teachers
 {
@@ -12,20 +12,26 @@ namespace Application.Services.Teachers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IValidator<TeacherDTO> _validator;
+        private readonly IValidator<TeacherCreateDTO> _teacherCreateDTOValidator;
+        private readonly IValidator<TeacherUpdateDTO> _teacherUpdateDTOValidator;
 
         private const string DbErrorMessage = "An unexpected database error occurred.";
         private Result<IEnumerable<TeacherDTO>> EmptyList() => ResultFactory.Success(Enumerable.Empty<TeacherDTO>());
-        public TeacherService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<TeacherDTO> validator)
+        public TeacherService(IUnitOfWork unitOfWork, IMapper mapper,
+            IValidator<TeacherCreateDTO> TeacherCreateDTOValidator,
+            IValidator<TeacherUpdateDTO> teacherUpdateDTOValidator)
         {
             this._unitOfWork = unitOfWork;
             this._mapper = mapper;
-            this._validator = validator;
+            this._teacherCreateDTOValidator = TeacherCreateDTOValidator;
+            this._teacherUpdateDTOValidator = teacherUpdateDTOValidator;
+
         }
-        public async Task<Result<TeacherDTO>> AddAsync(TeacherDTO teacherDTO)
+
+        public async Task<Result<TeacherDTO>> AddAsync(TeacherCreateDTO DTO)
         {
             // 1️ DTO validation
-            var dtoValidationResult = await _validator.ValidateAsync(teacherDTO);
+            var dtoValidationResult = await _teacherCreateDTOValidator.ValidateAsync(DTO);
             if (!dtoValidationResult.IsValid)
             {
                 var errors = dtoValidationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -33,14 +39,13 @@ namespace Application.Services.Teachers
             }
 
             // 2️ Map to domain & Domain validation
-            var teacherDomain = _mapper.Map<TeacherDomain>(teacherDTO);
-            var domainValidationResult = teacherDomain.ValidateBusinessRules();
+            var domainValidationResult = TeacherDomain.Create(DTO.Name, DTO.Subject,DTO.Salary, DTO.DepartmentId);
             if (!domainValidationResult.IsSuccess)
-            {
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
-            }
 
-            // 3️  Map to entity and save
+            var teacherDomain = domainValidationResult.Data;
+
+            
             var teacherEntity = _mapper.Map<TeacherEntity>(teacherDomain);
             try
             {
@@ -171,7 +176,7 @@ namespace Application.Services.Teachers
                 return ResultFactory.Fail<IEnumerable<TeacherDTO>>(ErrorType.InternalError, DbErrorMessage);
             }
         }
-        public async Task<Result<TeacherDTO>> UpdateAsync(TeacherDTO DTO)
+        public async Task<Result<TeacherDTO>> UpdateAsync(TeacherUpdateDTO DTO)
         {
             // 1️ Check if teacher exists in the database
             var existing = await _unitOfWork.Teachers.GetByIdAsync(DTO.Id);
@@ -180,23 +185,21 @@ namespace Application.Services.Teachers
 
 
             // 2 DTO validation using FluentValidation
-            var validationResult = await _validator.ValidateAsync(DTO);
+            var validationResult = await _teacherUpdateDTOValidator.ValidateAsync(DTO);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, errors);
             }
 
-            // 3 Map DTO to Domain
-            var teacherDomain = _mapper.Map<TeacherDomain>(DTO);
 
             // 4️ Application rules validation inside Domain
-
-            var domainValidationResult = teacherDomain.ValidateBusinessRules();
+            var domainValidationResult = TeacherDomain.Update(DTO.Id, DTO.Name, DTO.Subject, DTO.Salary, DTO.DepartmentId);
             if (!domainValidationResult.IsSuccess)
-            {
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.ValidationError, domainValidationResult.Errors);
-            }
+
+            var teacherDomain = domainValidationResult.Data;
+
 
             try
             {

@@ -25,6 +25,7 @@ namespace Infrastructure.Extensions
                         options.UseSqlServer(
                         configuration.GetConnectionString("MyConnection"),
                         b => b.MigrationsAssembly("Infrastructure"))
+                        .UseLazyLoadingProxies()
             );
 
             services.AddIdentity<ApplicationUserEntity, ApplicationRoleEntity>(options =>
