@@ -1,30 +1,47 @@
-﻿using Infrastructure.Data.Entities;
+﻿using Castle.Core.Logging;
+using Infrastructure.Data;
+using Infrastructure.Data.Entities;
 using Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Logging
 {
     public class ErrorLogService : IErrorLogService
     {
 
-        public ErrorLogService(IUnitOfWork unitOfWork)
+        private readonly ILogger<ErrorLogService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        public ErrorLogService(IUnitOfWork unitOfWork, ILogger<ErrorLogService> logger)
         {
-            UnitOfWork = unitOfWork;
+            _logger = logger;
+            _unitOfWork = unitOfWork;
         }
-
-        public IUnitOfWork UnitOfWork { get; }
 
         public async Task LogAsync(Exception ex, string Path, string Method)
         {
-            var log = new ErrorLogEntity
+            try
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace?? "",
-                Path = Path,
-                Method = Method,
-                CreatedAt = DateTime.UtcNow
-            };
+                var log = new ErrorLogEntity
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace ?? "",
+                    Path = Path,
+                    Method = Method,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _unitOfWork.Clear();
+                await _unitOfWork.ErrorLoggers.AddLogAsync(log);
+                await _unitOfWork.SaveChangesAsync();
 
-            await UnitOfWork.ErrorLoggers.AddLogAsync(log);
+            }
+            catch (Exception loggingEx)
+            {
+                // Log to ILogger if database logging fails
+                _logger.LogError(loggingEx, "Failed to log error to database. Original error: {OriginalMessage}", ex.Message);
+            }
         }
     }
 }

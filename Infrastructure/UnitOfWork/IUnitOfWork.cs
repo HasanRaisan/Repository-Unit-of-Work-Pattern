@@ -16,5 +16,6 @@ namespace Infrastructure.UnitOfWork
         IRepository<ApplicationRoleEntity> ApplicationRoles { get; }
         IErrorLogRepository ErrorLoggers { get; }
         Task<int> SaveChangesAsync();
+        void Clear();
     }
 }

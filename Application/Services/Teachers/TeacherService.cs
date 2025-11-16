@@ -66,7 +66,7 @@ namespace Application.Services.Teachers
             }
             catch (Exception ex)
             {
-                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method: MethodBase.GetCurrentMethod()?.Name?? nameof(AddAsync));
+                await _logger.LogAsync(Ex: ex, Path: PathForErrorLog, Method:nameof(AddAsync));
 
                 return ResultFactory.Fail<TeacherDTO>(ErrorType.InternalError, DbErrorMessage);
             }

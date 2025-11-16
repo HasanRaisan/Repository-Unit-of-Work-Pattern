@@ -80,7 +80,7 @@ namespace TeacherStudentAPI.Midlleware
                     }
                     catch ( Exception ex ) 
                     {
-                        Console.WriteLine($"Failed to log error to DB: {ex.Message}");
+                        _logger.LogError($"Failed to log error to DB: {ex.Message}");
                     }
                 }
                 await LogErrorToDatabase();

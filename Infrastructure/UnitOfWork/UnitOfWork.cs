@@ -36,5 +36,7 @@ namespace Infrastructure.UnitOfWork
 
         public async Task<int> SaveChangesAsync() =>  await _context.SaveChangesAsync();
         public void Dispose() => _context.Dispose();
+
+        public void Clear() => _context.ChangeTracker.Clear();
     }
 }
